@@ -202,8 +202,8 @@
         value: props.sensor.kind,
       };
       deviceInput.value.model = {
-        name: props.sensor.toString(),
-        value: props.sensor.toString(),
+        name: props.sensor.device.toString(),
+        value: props.sensor.device.toString(),
       };
       addressInput.value.model = {
         name: props.sensor.address.toString(),

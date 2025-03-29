@@ -35,6 +35,7 @@
       <gd-device-information-menu
         v-else-if="menu['deviceInformation']"
         :port="menu['deviceInformation'].port"
+        :device="menu['deviceInformation'].device"
         :active="i === menusCopy.length - 1"
         @shake="emits('shake')"
       />
