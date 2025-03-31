@@ -20,7 +20,7 @@
           <span class="gd-relay-information-task gd-caption-text">Relay</span>
         </div>
       </div>
-      <div class="gd-relay-action-container">
+      <div v-if="!relay.locked" class="gd-relay-action-container">
         <gd-input-button-small
           :tooltip="reading?.[0] ? 'Turn off' : 'Turn on'"
           :loading="flipLoading"
@@ -61,12 +61,13 @@
 
   async function flipState(): Promise<void> {
     if (props.reading === undefined) return;
+    const reading = props.reading[0];
     flipLoading.value = true;
 
     const result = await flipRelay(props.relay);
     setTimeout(() => {
       if (result && props.reading) {
-        updateReadingRelay(props.relay, !props.reading[0]);
+        updateReadingRelay(props.relay, reading);
       }
       flipLoading.value = false;
     }, 500);
@@ -200,7 +201,7 @@
       width: calc(100% + 6px);
       height: calc(100% + 6px);
       border: 2px solid var(--primary-color);
-      border-radius: calc(0.5rem + 2px);
+      border-radius: calc(0.75rem + 2px);
       box-sizing: border-box;
       box-shadow: 0 0 6px 0 var(--primary-color);
       opacity: 0;

@@ -46,6 +46,13 @@
         :active="i === menusCopy.length - 1"
         @shake="emits('shake')"
       />
+      <gd-relay-menu
+        v-if="menu['relay']"
+        :port="menu['relay'].port"
+        :relay="menu['relay'].relay"
+        :active="i === menusCopy.length - 1"
+        @shake="emits('shake')"
+      />
       <gd-sensor-menu
         v-if="menu['sensor']"
         :port="menu['sensor'].port"
@@ -102,7 +109,7 @@
       top: 0;
       right: 0;
     }
-    @media only screen and (min-width: 1025px) {
+    @media only screen and (min-width: 1281px) {
       width: 20rem;
       height: 100vh;
       background-color: var(--background-depth-two-color);

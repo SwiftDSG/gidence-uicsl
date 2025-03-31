@@ -340,19 +340,27 @@
     },
     { deep: true }
   );
+  watch(
+    () => gdInput.value,
+    () => {
+      if (gdInput.value) {
+        if (props.input.model.name) {
+          inputModel.value.name = props.input.model.name;
+          gdInput.value.value = inputModel.value.name;
+        }
+        if (props.input.model.value) {
+          inputModel.value.value = props.input.model.value;
+        }
+      }
+    },
+    { once: true }
+  );
 
   onBeforeUnmount(() => {
     window.removeEventListener("keydown", keyHandler);
   });
   onMounted(() => {
     id.value = generateRandomString();
-    if (props.input.model.name && gdInput.value) {
-      inputModel.value.name = props.input.model.name;
-      gdInput.value.value = inputModel.value.name;
-    }
-    if (props.input.model.value) {
-      inputModel.value.value = props.input.model.value;
-    }
   });
 </script>
 
@@ -588,6 +596,7 @@
     span.gd-input-option-text {
       position: relative;
       width: 100%;
+      color: #f0f0f0;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;

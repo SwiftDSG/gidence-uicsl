@@ -323,7 +323,12 @@
       const tl = gsap.timeline({
         paused: true,
         onStart() {
-          const { left, top, width } = gdParent.getBoundingClientRect();
+          const {
+            left,
+            top,
+            width,
+            height: h,
+          } = gdParent.getBoundingClientRect();
           const { height } = gdContent.getBoundingClientRect();
 
           gdContent.style.pointerEvents = "all";
@@ -335,7 +340,7 @@
             gdContent.style.top = "auto";
             gdContent.style.bottom = `${window.innerHeight - top}px`;
           } else {
-            gdContent.style.top = `${top + rem.value * 2}px`;
+            gdContent.style.top = `${top + 3 + h}px`;
             gdContent.style.bottom = "auto";
           }
         },
@@ -506,8 +511,7 @@
   .gd-popover-content {
     z-index: 999999999;
     position: absolute;
-    background: var(--background-depth-one-color);
-    box-shadow: var(--box-shadow);
+    background: rgba(#242529, 0.5);
     border: var(--border);
     padding: 0.5rem;
     border-radius: 0.5rem;
@@ -517,8 +521,9 @@
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
-    transform: scale(1.125);
+    transform: scale(0.9);
     transform-origin: top center;
+    backdrop-filter: blur(10px);
     opacity: 0;
   }
 </style>

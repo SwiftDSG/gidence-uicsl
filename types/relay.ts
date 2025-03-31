@@ -6,4 +6,5 @@ export type Relay = {
   address: number;
   count: number;
   position: number;
+  locked: boolean;
 }

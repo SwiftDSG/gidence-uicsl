@@ -37,7 +37,7 @@ export default () => {
   const updateSensor = async (sensor: Sensor): Promise<Sensor | null> => {
     try {
       const response: Response = await $fetch(
-        `${config.public.controllerBase}/sensor/${sensor.id}`,
+        `${config.public.controllerBase}/sensor`,
         "put",
         JSON.stringify(sensor)
       );

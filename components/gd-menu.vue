@@ -283,7 +283,7 @@
         }
       }
     }
-    @media only screen and (min-width: 1025px) {
+    @media only screen and (min-width: 1281px) {
       width: 20rem;
       .gd-panel {
         top: 0;

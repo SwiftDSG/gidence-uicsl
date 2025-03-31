@@ -41,7 +41,10 @@
           @clicked="removeAdjustment(i)"
         />
       </div>
-      <div class="gd-menu-adjustment-body">
+      <div
+        v-if="adjustment.kindInput.model.value"
+        class="gd-menu-adjustment-body"
+      >
         <div class="gd-menu-adjustment-equation">
           <gd-input-text
             class="gd-menu-adjustment-input"
@@ -104,7 +107,7 @@
     port: Port;
     sensor: Sensor;
   }>();
-  const { $fetch } = useNuxtApp();
+  const { closeMenu } = useMain();
   const { updateSensor, readSensor } = useSensor();
 
   const adjustmentNames = {
@@ -226,7 +229,10 @@
     try {
       testLoading.value = true;
 
-      const response = await readSensor(props.sensor);
+      const payload = JSON.parse(JSON.stringify(props.sensor)) as Sensor;
+      payload.adjustment = [];
+
+      const response = await readSensor(payload);
 
       setTimeout(async () => {
         testLoading.value = false;
@@ -251,7 +257,7 @@
     setTimeout(() => {
       submitLoading.value = false;
       if (result) {
-        emits("exit");
+        closeMenu();
       } else {
         emits("shake");
       }

@@ -124,6 +124,7 @@
       address,
       count,
       position,
+      locked: props.relay?.locked || true,
     };
   });
 

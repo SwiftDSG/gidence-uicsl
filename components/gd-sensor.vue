@@ -158,6 +158,9 @@
       span.gd-sensor-value-date {
         position: relative;
         line-height: 1;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow: hidden;
       }
     }
 
@@ -169,7 +172,7 @@
       width: calc(100% + 6px);
       height: calc(100% + 6px);
       border: 2px solid var(--primary-color);
-      border-radius: calc(0.5rem + 2px);
+      border-radius: calc(0.75rem + 2px);
       box-sizing: border-box;
       box-shadow: 0 0 6px 0 var(--primary-color);
       opacity: 0;

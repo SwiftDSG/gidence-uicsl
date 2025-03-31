@@ -41,6 +41,10 @@ export type Menu = {
     port: Port;
     device: Sensor | Relay;
   };
+  relay?: {
+    port: Port;
+    relay: Relay;
+  };
   sensor?: {
     port: Port;
     sensor: Sensor;

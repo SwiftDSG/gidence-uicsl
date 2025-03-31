@@ -8,6 +8,7 @@
       loading || buttonAnimating ? 'gd-input-component-animating' : ''
     } gd-input-component-${type ? type : 'primary'}`"
     :disabled="disabled"
+    :style="radius ? `border-radius: ${radius}rem` : ''"
     @mousedown="mouseDownHandler"
     @keydown.space.enter="keyDownHandler"
   >
@@ -44,8 +45,19 @@
         <div class="gd-input-progress-bar-inner"></div>
       </div>
     </div>
-    <div class="gd-input-border"></div>
-    <div class="gd-input-overlay"></div>
+    <div
+      class="gd-input-border"
+      :style="radius ? `border-radius: ${radius}rem` : ''"
+    >
+      <div
+        class="gd-input-border-outline"
+        :style="radius ? `border-radius: calc(${radius}rem + 2px)` : ''"
+      ></div>
+    </div>
+    <div
+      class="gd-input-overlay"
+      :style="radius ? `border-radius: ${radius}rem` : ''"
+    ></div>
   </button>
 </template>
 
@@ -54,6 +66,7 @@
 
   const props = defineProps<{
     label: string;
+    radius?: number;
     type?: "primary" | "secondary" | "error" | "background";
     icon?: string;
     disabled?: boolean;
@@ -319,8 +332,7 @@
       box-sizing: border-box;
       transition: 0.25s border-color, 0.25s border-width;
 
-      &::before {
-        content: "";
+      .gd-input-border-outline {
         position: absolute;
         top: -3px;
         left: -3px;
@@ -421,7 +433,7 @@
       .gd-input-border {
         border-color: var(--primary-color);
 
-        &::before {
+        .gd-input-border-outline {
           opacity: 0.25;
         }
       }

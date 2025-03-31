@@ -149,7 +149,7 @@
       font-size: 19px;
     }
 
-    @media only screen and (max-width: 1320px) and (min-width: 1025px) {
+    @media only screen and (max-width: 1320px) and (min-width: 641px) {
       font-size: 18px;
     }
 
@@ -244,7 +244,7 @@
 
   .gd-body-text {
     font-size: 0.6rem;
-    font-weight: 500;
+    font-weight: 400;
     font-family: "Poppins";
   }
 

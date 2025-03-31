@@ -61,6 +61,7 @@
               <gd-input-button
                 label="add device"
                 type="background"
+                :radius="0.75"
                 @clicked="openMenu({ deviceInformation: { port } })"
               />
             </div>
@@ -84,6 +85,9 @@
                   :selected="instrumentSelected === device.relay.id"
                   :relay="device.relay"
                   :reading="reading.relay[device.relay.id]"
+                  @select="
+                    openMenu({ relay: { relay: device.relay, port: port } })
+                  "
                 />
               </div>
             </div>
@@ -92,6 +96,7 @@
             <gd-input-button
               label="add port"
               type="background"
+              :radius="1"
               @clicked="
                 openMenu({
                   portInformation: {},
@@ -179,8 +184,12 @@
         menus.value[i]["deviceDelete"].device?.id ||
         menus.value[i]["deviceDelete"].port.id
       );
+    } else if (menus.value[i]["relay"]) {
+      return menus.value[i]["relay"].relay.id;
     } else if (menus.value[i]["sensor"]) {
       return menus.value[i]["sensor"].sensor.id;
+    } else if (menus.value[i]["sensorAdjustment"]) {
+      return menus.value[i]["sensorAdjustment"].sensor.id;
     }
     return null;
   });
@@ -228,7 +237,7 @@
 <style lang="scss" scoped>
   .gd-container {
     position: relative;
-    width: calc(100% - 20rem);
+    width: 100%;
     background: var(--background-depth-three-color);
     display: flex;
 
@@ -402,6 +411,33 @@
 
           &.gd-controller-port-active::before {
             opacity: 1;
+          }
+        }
+      }
+    }
+    @media only screen and (min-width: 1281px) {
+      width: calc(100% - 20rem);
+    }
+    @media only screen and (max-width: 640px) {
+      .gd-controller {
+        .gd-controller-header {
+          .gd-controller-name-container {
+            display: none;
+          }
+
+          .gd-controller-status-container {
+            width: 100%;
+            justify-content: space-between;
+          }
+        }
+
+        .gd-controller-body {
+          .gd-controller-port {
+            .gd-controller-port-body {
+              .gd-controller-port-device {
+                width: 100%;
+              }
+            }
           }
         }
       }

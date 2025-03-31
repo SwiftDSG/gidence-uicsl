@@ -15,7 +15,6 @@
               device.controller.id
             }}</span>
           </div>
-          <gd-input-button-small icon="copy" tooltip="Copy ID" />
         </div>
         <div class="gd-menu-information-container">
           <div class="gd-menu-information">
@@ -26,7 +25,6 @@
               addressWrite(device.controller.address)
             }}</span>
           </div>
-          <gd-input-button-small icon="copy" tooltip="Copy address" />
         </div>
       </div>
       <div
@@ -193,12 +191,22 @@
           display: flex;
           justify-content: center;
           align-items: center;
+          flex-shrink: 0;
         }
 
         .gd-menu-item-information {
           position: relative;
+          width: calc(100% - 2.5rem);
           display: flex;
           flex-direction: column;
+
+          span.gd-menu-item-information-placeholder {
+            position: relative;
+            width: 100%;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+          }
         }
 
         &::after {
@@ -259,9 +267,16 @@
 
         .gd-menu-item-information {
           position: relative;
-          width: 100%;
+          width: calc(100% - 4.5rem);
           display: flex;
           flex-direction: column;
+          span.gd-menu-item-information-placeholder {
+            position: relative;
+            width: 100%;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+          }
         }
 
         .gd-menu-item-information-input {

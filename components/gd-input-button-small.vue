@@ -32,8 +32,8 @@
     </div>
     <div class="gd-input-overlay"></div>
     <div class="gd-input-border"></div>
-    <client-only>
-      <div class="gd-input-tooltip" v-if="tooltip && view === 'desktop'">
+    <client-only v-if="tooltip && view === 'desktop'">
+      <div class="gd-input-tooltip">
         <span class="gd-input-tooltip-message gd-headline-6">{{
           tooltip
         }}</span>
@@ -419,7 +419,7 @@
       pointer-events: none;
     }
 
-    @media only screen and (min-width: 1025px) {
+    @media only screen and (min-width: 1281px) {
       &:hover {
         z-index: 10;
 
