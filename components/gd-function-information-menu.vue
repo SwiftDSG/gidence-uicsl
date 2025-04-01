@@ -75,6 +75,7 @@
     relays: Relay[];
     sensors: Sensor[];
   }>();
+  const { closeMenu, updateDeviceFunction } = useMain();
   const { createFunction, updateFunction } = useFunction();
 
   const submitLoading = ref<boolean>(false);
@@ -159,7 +160,8 @@
       setTimeout(() => {
         submitLoading.value = false;
         if (result) {
-          emits("exit", { controller_funtion: result });
+          updateDeviceFunction(result);
+          closeMenu();
         } else {
           emits("shake");
         }

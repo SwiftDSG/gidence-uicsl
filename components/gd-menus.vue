@@ -71,7 +71,6 @@
         v-if="menu['function']"
         :sensors="menu['function'].sensors"
         :relays="menu['function'].relays"
-        :functions="menu['function'].functions"
         :active="i === menusCopy.length - 1"
         @shake="emits('shake')"
       />
@@ -95,7 +94,6 @@
         :sensors="menu['watcher'].sensors"
         :relays="menu['watcher'].relays"
         :functions="menu['watcher'].functions"
-        :watchers="menu['watcher'].watchers"
         :active="i === menusCopy.length - 1"
         @shake="emits('shake')"
       />
@@ -112,6 +110,30 @@
       <gd-watcher-delete-menu
         v-if="menu['watcherDelete']"
         :watcher="menu['watcherDelete'].watcher"
+        :active="i === menusCopy.length - 1"
+        @shake="emits('shake')"
+      />
+      <gd-cron-menu
+        v-if="menu['cron']"
+        :sensors="menu['cron'].sensors"
+        :relays="menu['cron'].relays"
+        :functions="menu['cron'].functions"
+        :active="i === menusCopy.length - 1"
+        @shake="emits('shake')"
+      />
+      <gd-cron-information-menu
+        v-if="menu['cronInformation']"
+        :sensors="menu['cronInformation'].sensors"
+        :relays="menu['cronInformation'].relays"
+        :functions="menu['cronInformation'].functions"
+        :crons="menu['cronInformation'].crons"
+        :cron="menu['cronInformation'].cron"
+        :active="i === menusCopy.length - 1"
+        @shake="emits('shake')"
+      />
+      <gd-cron-delete-menu
+        v-if="menu['cronDelete']"
+        :cron="menu['cronDelete'].cron"
         :active="i === menusCopy.length - 1"
         @shake="emits('shake')"
       />

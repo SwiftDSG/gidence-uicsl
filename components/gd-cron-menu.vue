@@ -1,37 +1,38 @@
 <template>
-  <gd-menu :active="active" label="Function List" class="gd-menu">
+  <gd-menu :active="active" label="Schedulers List" class="gd-menu">
     <p class="gd-menu-message gd-caption-text">
-      By creating a function, you can chain multiple commands. You will see your
-      functions here.
+      By creating a scheduler, you can decide when a function will be triggered.
+      You will see your schedulers here.
     </p>
-    <div v-if="functions.length" class="gd-menu-functions">
-      <gd-function
-        v-for="fn in functions"
-        :key="fn.id"
-        :function="fn"
+    <div v-if="crons.length" class="gd-menu-crons">
+      <gd-cron
+        v-for="cron in crons"
+        :key="cron.id"
+        :cron="cron"
         @open="
-          (fn) =>
-            openMenu({
-              functionInformation: {
-                function: fn,
-                functions,
-                sensors,
-                relays,
-              },
-            })
+          openMenu({
+            cronInformation: {
+              cron,
+              crons,
+              sensors,
+              relays,
+              functions,
+            },
+          })
         "
-        @delete="(fn) => openMenu({ functionDelete: { function: fn } })"
+        @delete="(cron) => openMenu({ cronDelete: { cron } })"
       />
     </div>
     <gd-input-button
-      label="add function"
+      label="add scheduler"
       type="background"
       @clicked="
         openMenu({
-          functionInformation: {
-            functions,
+          cronInformation: {
+            crons,
             sensors,
             relays,
+            functions,
           },
         })
       "
@@ -43,18 +44,20 @@
   import type { Function } from "~/types/function";
   import type { Relay } from "~/types/relay";
   import type { Sensor } from "~/types/sensor";
+  import type { Cron } from "~/types/cron";
 
+  const emits = defineEmits(["exit", "open", "edit"]);
   const props = defineProps<{
     active: boolean;
     sensors: Sensor[];
     relays: Relay[];
+    functions: Function[];
   }>();
-  const emits = defineEmits(["exit", "open", "edit"]);
   const { device, openMenu } = useMain();
 
-  const functions = computed<Function[]>(() => {
+  const crons = computed<Cron[]>(() => {
     return device.value
-      ? Object.values(device.value.function).sort((a, b) =>
+      ? Object.values(device.value.cron).sort((a, b) =>
           a.name.toLowerCase() > b.name.toLowerCase() ? 1 : -1
         )
       : [];
@@ -73,7 +76,7 @@
       margin-bottom: 1rem;
     }
 
-    .gd-menu-functions {
+    .gd-menu-crons {
       position: relative;
       width: 100%;
       margin-bottom: 1rem;

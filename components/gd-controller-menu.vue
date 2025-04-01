@@ -56,7 +56,6 @@
             function: {
               sensors,
               relays,
-              functions,
             },
           })
         "
@@ -81,7 +80,6 @@
               sensors,
               relays,
               functions,
-              watchers,
             },
           })
         "
@@ -95,6 +93,30 @@
           >
           <span class="gd-menu-item-information-placeholder gd-caption-text"
             >See or change the watchers in this controller</span
+          >
+        </div>
+      </div>
+      <div
+        class="gd-menu-item"
+        @click="
+          openMenu({
+            cron: {
+              sensors,
+              relays,
+              functions,
+            },
+          })
+        "
+      >
+        <div class="gd-menu-item-icon">
+          <gd-svg name="clock" />
+        </div>
+        <div class="gd-menu-item-information">
+          <span class="gd-menu-item-information-value gd-headline-5"
+            >Schedulers</span
+          >
+          <span class="gd-menu-item-information-placeholder gd-caption-text"
+            >See or change the schedulers in this controller</span
           >
         </div>
       </div>
@@ -162,13 +184,6 @@
   const functions = computed<Function[]>(() => {
     return device.value
       ? Object.values(device.value.function).sort((a, b) =>
-          a.name.toLowerCase() > b.name.toLowerCase() ? 1 : -1
-        )
-      : [];
-  });
-  const watchers = computed<Watcher[]>(() => {
-    return device.value
-      ? Object.values(device.value.watcher).sort((a, b) =>
           a.name.toLowerCase() > b.name.toLowerCase() ? 1 : -1
         )
       : [];

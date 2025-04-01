@@ -52,9 +52,16 @@
     sensors: Sensor[];
     relays: Relay[];
     functions: Function[];
-    watchers: Watcher[];
   }>();
-  const { openMenu } = useMain();
+  const { device, openMenu } = useMain();
+
+  const watchers = computed<Watcher[]>(() => {
+    return device.value
+      ? Object.values(device.value.watcher).sort((a, b) =>
+          a.name.toLowerCase() > b.name.toLowerCase() ? 1 : -1
+        )
+      : [];
+  });
 </script>
 
 <style lang="scss" scoped>

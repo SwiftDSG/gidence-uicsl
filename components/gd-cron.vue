@@ -1,62 +1,62 @@
 <template>
-  <div class="gd-watcher">
-    <div class="gd-watcher-information-container" @click="emits('open')">
-      <span class="gd-watcher-information-name gd-headline-5">{{
-        watcher.name
+  <div class="gd-cron">
+    <div class="gd-cron-information-container" @click="emits('open')">
+      <span class="gd-cron-information-name gd-headline-5">{{
+        cron.name
       }}</span>
     </div>
-    <div class="gd-watcher-action-container">
+    <div class="gd-cron-action-container">
       <gd-input-button-small
-        :tooltip="watcher.active ? 'Disable watcher' : 'Enable watcher'"
+        :tooltip="cron.active ? 'Disable cron' : 'Enable cron'"
         icon="power"
         @clicked="toggle"
-        :loading="watcherLoading"
-        :type="watcher.active ? 'default' : 'primary'"
+        :loading="cronLoading"
+        :type="cron.active ? 'default' : 'primary'"
       />
       <gd-input-button-small
-        tooltip="Delete watcher"
+        tooltip="Delete cron"
         icon="delete"
         type="error"
-        @clicked="emits('delete', watcher)"
+        @clicked="emits('delete', cron)"
       />
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
-  import type { Watcher } from "~/types/watcher";
+  import type { Cron } from "~/types/cron";
 
   const props = defineProps<{
-    watcher: Watcher;
+    cron: Cron;
   }>();
   const emits = defineEmits(["open", "delete"]);
 
-  const { updateDeviceWatcher } = useMain();
-  const { updateWatcher } = useWatcher();
+  const { updateDeviceCron } = useMain();
+  const { updateCron } = useCron();
 
-  const watcherLoading = ref<boolean>(false);
+  const cronLoading = ref<boolean>(false);
 
   async function toggle() {
-    watcherLoading.value = true;
+    cronLoading.value = true;
 
     const payload = {
-      ...props.watcher,
-      active: !props.watcher.active,
+      ...props.cron,
+      active: !props.cron.active,
     };
 
-    const result = await updateWatcher(payload);
+    const result = await updateCron(payload);
 
     setTimeout(async () => {
       if (result) {
-        updateDeviceWatcher(result);
+        updateDeviceCron(result);
       }
-      watcherLoading.value = false;
+      cronLoading.value = false;
     }, 500);
   }
 </script>
 
 <style lang="scss" scoped>
-  .gd-watcher {
+  .gd-cron {
     position: relative;
     width: 100%;
     padding: 0.75rem;
@@ -68,7 +68,7 @@
     justify-content: space-between;
     align-items: center;
 
-    .gd-watcher-information-container {
+    .gd-cron-information-container {
       cursor: pointer;
       position: relative;
       height: 100%;
@@ -80,7 +80,7 @@
       }
     }
 
-    .gd-watcher-action-container {
+    .gd-cron-action-container {
       position: relative;
       display: flex;
       gap: 0.5rem;

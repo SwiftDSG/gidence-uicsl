@@ -1,7 +1,10 @@
 
-import { Port } from "~/types/port";
-import { Relay } from "~/types/relay";
-import { Sensor } from "~/types/sensor";
+import type { Cron } from "~/types/cron";
+import type { Function } from "~/types/function";
+import type { Port } from "~/types/port";
+import type { Relay } from "~/types/relay";
+import type { Sensor } from "~/types/sensor";
+import type { Watcher } from "~/types/watcher";
 import type { Device, Menu, Reading, State, Theme, View } from "~~/types/general";
 
 export default function () {
@@ -50,6 +53,18 @@ export default function () {
   const updateDeviceRelay = (relay: Relay): void => {
     if (!device.value) return;
     device.value.relay[relay.id] = relay;
+  }
+  const updateDeviceFunction = (fn: Function): void => {
+    if (!device.value) return;
+    device.value.function[fn.id] = fn;
+  }
+  const updateDeviceWatcher = (watcher: Watcher): void => {
+    if (!device.value) return;
+    device.value.watcher[watcher.id] = watcher;
+  }
+  const updateDeviceCron = (cron: Cron): void => {
+    if (!device.value) return;
+    device.value.cron[cron.id] = cron;
   }
   const updateReadingRelay = (relay: Relay, state: boolean): void => {
     if (!reading.value) return;
@@ -109,6 +124,9 @@ export default function () {
     updateDevicePort,
     updateDeviceSensor,
     updateDeviceRelay,
+    updateDeviceFunction,
+    updateDeviceWatcher,
+    updateDeviceCron,
     updateReadingRelay,
   };
 }

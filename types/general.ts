@@ -57,7 +57,6 @@ export type Menu = {
   function?: {
     sensors: Sensor[];
     relays: Relay[];
-    functions: Function[];
   };
   functionInformation?: {
     sensors: Sensor[];
@@ -72,7 +71,6 @@ export type Menu = {
     sensors: Sensor[];
     relays: Relay[];
     functions: Function[];
-    watchers: Watcher[];
   };
   watcherInformation?: {
     sensors: Sensor[];
@@ -83,6 +81,21 @@ export type Menu = {
   };
   watcherDelete?: {
     watcher: Watcher;
+  };
+  cron?: {
+    sensors: Sensor[];
+    relays: Relay[];
+    functions: Function[];
+  };
+  cronInformation?: {
+    sensors: Sensor[];
+    relays: Relay[];
+    functions: Function[];
+    crons: Cron[];
+    cron?: Cron;
+  };
+  cronDelete?: {
+    cron: Cron;
   };
 }
 

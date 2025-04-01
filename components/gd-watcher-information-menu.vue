@@ -2,7 +2,6 @@
   <gd-menu
     :active="active"
     :label="watcher ? 'Edit Watcher' : 'Create Watcher'"
-    @exit="emits('exit')"
     class="gd-menu"
   >
     <div class="gd-menu-informations">
@@ -67,7 +66,7 @@
     watcher?: Watcher;
   }>();
   const { createWatcher, updateWatcher } = useWatcher();
-  const { closeMenu } = useMain();
+  const { closeMenu, updateDeviceWatcher } = useMain();
 
   const submitLoading = ref<boolean>(false);
 
@@ -126,6 +125,7 @@
     setTimeout(() => {
       submitLoading.value = false;
       if (result) {
+        updateDeviceWatcher(result);
         closeMenu();
       } else {
         emits("shake");
@@ -135,9 +135,6 @@
 
   onMounted(() => {
     fillOptions(props.functions);
-
-    console.log(props.watcher);
-    console.log(props.functions);
 
     if (props.watcher) {
       condition.value = props.watcher.condition;

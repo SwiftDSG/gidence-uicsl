@@ -1,13 +1,13 @@
 <template>
   <gd-menu
-    :label="controllerWatcher ? 'Edit watcher' : 'Create watcher'"
-    @exit="emits('exit')"
+    :active="active"
+    :label="cron ? 'Edit Scheduler' : 'Create Scheduler'"
     class="gd-menu"
   >
     <div class="gd-menu-informations">
       <div class="gd-menu-informations-header">
         <span class="gd-menu-informations-title gd-headline-5">
-          Watcher information
+          Cron information
         </span>
       </div>
       <div class="gd-menu-informations-body">
@@ -27,21 +27,11 @@
       </div>
       <div class="gd-menu-informations-body">
         <div class="gd-menu-input-wrapper">
-          <gd-input-select class="gd-menu-input" :input="kindInput" />
-        </div>
-        <gd-controller-function-task-condition
-          v-if="kind === 'condition'"
-          :master="true"
-          :condition="condition"
-          :controller-port-device="controllerPortDevice"
-          :controller-processor-camera="controllerProcessorCamera"
-        />
-        <div v-else-if="kind === 'cron'" class="gd-menu-input-wrapper">
-          <gd-input-text class="gd-menu-input-cron" :input="cronInput[0]" />
-          <gd-input-text class="gd-menu-input-cron" :input="cronInput[1]" />
-          <gd-input-text class="gd-menu-input-cron" :input="cronInput[2]" />
-          <gd-input-text class="gd-menu-input-cron" :input="cronInput[3]" />
-          <gd-input-text class="gd-menu-input-cron" :input="cronInput[4]" />
+          <gd-input-text class="gd-menu-input-cron" :input="fieldInput[0]" />
+          <gd-input-text class="gd-menu-input-cron" :input="fieldInput[1]" />
+          <gd-input-text class="gd-menu-input-cron" :input="fieldInput[2]" />
+          <gd-input-text class="gd-menu-input-cron" :input="fieldInput[3]" />
+          <gd-input-text class="gd-menu-input-cron" :input="fieldInput[4]" />
         </div>
       </div>
     </div>
@@ -49,8 +39,8 @@
     <div class="gd-menu-footer">
       <gd-input-button
         style="width: 100%"
-        :label="controllerWatcher ? 'Update watcher' : 'Save watcher'"
-        :disabled="!name || !controller_function_id || !trigger"
+        :label="cron ? 'Update scheduler' : 'Save scheduler'"
+        :disabled="!name || !function_id"
         :loading="submitLoading"
         @clicked="submit"
       />
@@ -62,27 +52,26 @@
   import type { InputOption, InputSelectOption } from "~/types/general";
   import type { Sensor } from "~/types/sensor";
   import type { Relay } from "~/types/relay";
-  import type { Watcher } from "~/types/watcher";
-  import type { Function, FunctionTaskCondition } from "~/types/function";
+  import type { Cron } from "~/types/cron";
+  import type { Function } from "~/types/function";
 
   const emits = defineEmits(["exit", "shake"]);
   const props = defineProps<{
     active: boolean;
     sensors: Sensor[];
     relays: Relay[];
-    watchers: Watcher[];
+    crons: Cron[];
     functions: Function[];
-    watcher?: Watcher;
+    cron?: Cron;
   }>();
-  const { createWatcher, updateWatcher } = useWatcher();
+  const { createCron, updateCron } = useCron();
+  const { closeMenu, updateDeviceCron } = useMain();
 
   const submitLoading = ref<boolean>(false);
 
-  const condition = ref<FunctionTaskCondition>({});
-
   const nameInput = ref<InputOption>({
     name: "name",
-    label: "Watcher name",
+    label: "Cron name",
     placeholder: "Emergency Conditions",
     model: {
       name: "",
@@ -100,7 +89,7 @@
     },
     options: [],
   });
-  const cronInput = ref<
+  const fieldInput = ref<
     [InputOption, InputOption, InputOption, InputOption, InputOption]
   >([
     {
@@ -149,39 +138,14 @@
       },
     },
   ]);
-  const kindInput = ref<InputSelectOption<"cron" | "condition" | "">>({
-    name: "kind",
-    label: "Method",
-    placeholder: "Select one",
-    strict: true,
-    model: {
-      name: "",
-      value: "",
-    },
-    options: [
-      {
-        name: "Condition",
-        value: "condition",
-      },
-      {
-        name: "Scheduled",
-        value: "cron",
-      },
-    ],
-  });
 
   const name = computed<string>(() => nameInput.value.model.value);
-  const controller_function_id = computed<string>(
-    () => functionInput.value.model.value
-  );
-  const kind = computed<"cron" | "condition" | "">(
-    () => kindInput.value.model.value
-  );
-  const cron = computed<ControllerWatcherCron>(() => {
-    // ControllerWatcherCron = [ControllerWatcherCronField?, ControllerWatcherCronField?, ControllerWatcherCronField?, ControllerWatcherCronField?, ControllerWatcherCronField?]
-    const inputs = cronInput.value.map<string>((a) => a.model.value);
+  const function_id = computed<string>(() => functionInput.value.model.value);
+  const field = computed<Cron["field"]>(() => {
+    // ControllerCronCron = [ControllerCronCronField?, ControllerCronCronField?, ControllerCronCronField?, ControllerCronCronField?, ControllerCronCronField?]
+    const inputs = fieldInput.value.map<string>((a) => a.model.value);
 
-    const fields: ControllerWatcherCron = [
+    const fields: Cron["field"] = [
       undefined,
       undefined,
       undefined,
@@ -211,51 +175,38 @@
 
     return fields;
   });
-  const trigger = computed<ControllerWatcherRequest["trigger"] | null>(() => {
-    if (kind.value === "condition") {
-      return {
-        condition: condition.value,
-      };
-    } else if (kind.value === "cron") {
-      return {
-        cron: cron.value,
-      };
-    } else {
-      return null;
-    }
-  });
 
-  function fillOptions(datas: ControllerFunction[]) {
+  function fillOptions(datas: Function[]) {
     for (const fn of datas) {
       functionInput.value.options.push({
         name: fn.name,
-        value: fn._id,
+        value: fn.id,
       });
     }
   }
   async function submit() {
-    if (!trigger.value) return;
-
-    const payload: ControllerWatcherRequest = {
+    const payload: Cron = {
+      id: props.cron?.id || "",
       name: name.value,
-      controller_id: props.controller._id,
-      controller_function_id: controller_function_id.value,
-      trigger: trigger.value,
+      function_id: function_id.value,
+      field: field.value,
+      active: props.cron?.active || false,
     };
 
     submitLoading.value = true;
 
     let result;
-    if (props.controllerWatcher) {
-      result = await updateWatcher(props.controllerWatcher._id, payload);
+    if (props.cron) {
+      result = await updateCron(payload);
     } else {
-      result = await createWatcher(payload);
+      result = await createCron(payload);
     }
 
     setTimeout(() => {
       submitLoading.value = false;
       if (result) {
-        emits("exit", { controller_watcher: result });
+        updateDeviceCron(result);
+        closeMenu();
       } else {
         emits("shake");
       }
@@ -263,52 +214,41 @@
   }
 
   onMounted(() => {
-    fillOptions(props.controllerFunction);
+    fillOptions(props.functions);
 
-    if (props.controllerWatcher) {
+    if (props.cron) {
+      const cron = props.cron.field;
+      for (let i = 0; i < cron.length; i++) {
+        const v = cron[i];
+        if (v?.step) {
+          fieldInput.value[i].model = {
+            name: `${v.step[0]}/${v.step[1]}`,
+            value: `${v.step[0]}/${v.step[1]}`,
+          };
+        } else if (v?.range) {
+          fieldInput.value[i].model = {
+            name: `${v.range[0]}-${v.range[1]}`,
+            value: `${v.range[0]}-${v.range[1]}`,
+          };
+        } else if (v && (v.value || 0) >= 0) {
+          const value = v.value || 0;
+          fieldInput.value[i].model = {
+            name: value.toString(),
+            value: value.toString(),
+          };
+        }
+      }
+
       nameInput.value.model = {
-        name: props.controllerWatcher.name,
-        value: props.controllerWatcher.name,
+        name: props.cron.name,
+        value: props.cron.name,
       };
       functionInput.value.model = {
         name:
-          props.controllerFunction.find(
-            (fn) => fn._id === props.controllerWatcher?.controller_function_id
-          )?.name || props.controllerWatcher.controller_function_id,
-        value: props.controllerWatcher.controller_function_id,
+          props.functions.find((fn) => fn.id === props.cron?.function_id)
+            ?.name || props.cron.function_id,
+        value: props.cron.function_id,
       };
-      if (props.controllerWatcher.trigger.condition) {
-        condition.value = props.controllerWatcher.trigger.condition;
-        kindInput.value.model = {
-          name: "Condition",
-          value: "condition",
-        };
-      } else if (props.controllerWatcher.trigger.cron) {
-        kindInput.value.model = {
-          name: "Scheduled",
-          value: "cron",
-        };
-        const cron = props.controllerWatcher.trigger.cron;
-        for (let i = 0; i < cron.length; i++) {
-          const v = cron[i];
-          if (v?.step) {
-            cronInput.value[i].model = {
-              name: `${v.step[0]}/${v.step[1]}`,
-              value: `${v.step[0]}/${v.step[1]}`,
-            };
-          } else if (v?.range) {
-            cronInput.value[i].model = {
-              name: `${v.range[0]}-${v.range[1]}`,
-              value: `${v.range[0]}-${v.range[1]}`,
-            };
-          } else if (v?.value) {
-            cronInput.value[i].model = {
-              name: v.value.toString(),
-              value: v.value.toString(),
-            };
-          }
-        }
-      }
     }
   });
 </script>
