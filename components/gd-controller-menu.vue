@@ -49,6 +49,55 @@
           >
         </div>
       </div>
+      <div
+        class="gd-menu-item"
+        @click="
+          openMenu({
+            function: {
+              sensors,
+              relays,
+              functions,
+            },
+          })
+        "
+      >
+        <div class="gd-menu-item-icon">
+          <gd-svg name="code" />
+        </div>
+        <div class="gd-menu-item-information">
+          <span class="gd-menu-item-information-value gd-headline-5"
+            >Functions</span
+          >
+          <span class="gd-menu-item-information-placeholder gd-caption-text"
+            >See or change the functions in this controller</span
+          >
+        </div>
+      </div>
+      <div
+        class="gd-menu-item"
+        @click="
+          openMenu({
+            watcher: {
+              sensors,
+              relays,
+              functions,
+              watchers,
+            },
+          })
+        "
+      >
+        <div class="gd-menu-item-icon">
+          <gd-svg name="eye" />
+        </div>
+        <div class="gd-menu-item-information">
+          <span class="gd-menu-item-information-value gd-headline-5"
+            >Watchers</span
+          >
+          <span class="gd-menu-item-information-placeholder gd-caption-text"
+            >See or change the watchers in this controller</span
+          >
+        </div>
+      </div>
     </div>
     <div class="gd-menu-footer">
       <div class="gd-menu-item">
@@ -75,8 +124,12 @@
 </template>
 
 <script lang="ts" setup>
-  import { Controller } from "~/types/controller";
-  import { InputToggleOption, Theme } from "~/types/general";
+  import type { InputToggleOption, Theme } from "~/types/general";
+  import type { Controller } from "~/types/controller";
+  import type { Function } from "~/types/function";
+  import type { Relay } from "~/types/relay";
+  import type { Sensor } from "~/types/sensor";
+  import type { Watcher } from "~/types/watcher";
 
   const emits = defineEmits(["shake"]);
   const props = defineProps<{
@@ -92,6 +145,34 @@
   const theme = computed<Theme>(() =>
     themeInput.value.model ? "dark" : "light"
   );
+  const sensors = computed<Sensor[]>(() => {
+    return device.value
+      ? Object.values(device.value.sensor).sort((a, b) =>
+          a.name.toLowerCase() > b.name.toLowerCase() ? 1 : -1
+        )
+      : [];
+  });
+  const relays = computed<Relay[]>(() => {
+    return device.value
+      ? Object.values(device.value.relay).sort((a, b) =>
+          a.name.toLowerCase() > b.name.toLowerCase() ? 1 : -1
+        )
+      : [];
+  });
+  const functions = computed<Function[]>(() => {
+    return device.value
+      ? Object.values(device.value.function).sort((a, b) =>
+          a.name.toLowerCase() > b.name.toLowerCase() ? 1 : -1
+        )
+      : [];
+  });
+  const watchers = computed<Watcher[]>(() => {
+    return device.value
+      ? Object.values(device.value.watcher).sort((a, b) =>
+          a.name.toLowerCase() > b.name.toLowerCase() ? 1 : -1
+        )
+      : [];
+  });
 
   function addressWrite(address: Controller["address"]): string {
     return `${address.host.join(".")}:${address.port}`;

@@ -129,7 +129,7 @@
         setTimeout(() => {
           submitLoading.value = false;
           if (result) {
-            updateDeviceSensor(payload.value as Sensor);
+            updateDeviceSensor(result);
             closeMenu();
           } else {
             emits("shake");
@@ -140,7 +140,7 @@
         setTimeout(() => {
           submitLoading.value = false;
           if (result) {
-            updateDeviceRelay(payload.value as Relay);
+            updateDeviceRelay(result);
             closeMenu();
           } else {
             emits("shake");
@@ -153,7 +153,7 @@
         setTimeout(() => {
           submitLoading.value = false;
           if (result) {
-            updateDeviceSensor(payload.value as Sensor);
+            updateDeviceSensor(result);
             closeMenu();
           } else {
             emits("shake");
@@ -164,7 +164,7 @@
         setTimeout(() => {
           submitLoading.value = false;
           if (result) {
-            updateDeviceRelay(payload.value as Relay);
+            updateDeviceRelay(result);
             closeMenu();
           } else {
             emits("shake");

@@ -42,6 +42,6 @@ export type FunctionTaskConditionRelayComparison = {
 }
 
 export type FunctionTaskCommand = {
-  relay?: [string, boolean];
-  function?: string;
+  relay?: [string, boolean]; // Relay ID, State
+  function?: string; // Function ID
 }

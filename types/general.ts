@@ -4,6 +4,7 @@ import type { Port } from "~/types/port";
 import type { Relay } from "~/types/relay";
 import type { Sensor } from "~/types/sensor";
 import type { Watcher } from "~/types/watcher";
+import type { Function } from "~/types/function";
 
 export type View = "desktop" | "mobile" | "tab" | null;
 export type Theme = "light" | "dark";
@@ -52,6 +53,36 @@ export type Menu = {
   sensorAdjustment?: {
     port: Port;
     sensor: Sensor;
+  };
+  function?: {
+    sensors: Sensor[];
+    relays: Relay[];
+    functions: Function[];
+  };
+  functionInformation?: {
+    sensors: Sensor[];
+    relays: Relay[];
+    functions: Function[];
+    function?: Function;
+  };
+  functionDelete?: {
+    function: Function;
+  };
+  watcher?: {
+    sensors: Sensor[];
+    relays: Relay[];
+    functions: Function[];
+    watchers: Watcher[];
+  };
+  watcherInformation?: {
+    sensors: Sensor[];
+    relays: Relay[];
+    functions: Function[];
+    watchers: Watcher[];
+    watcher?: Watcher;
+  };
+  watcherDelete?: {
+    watcher: Watcher;
   };
 }
 

@@ -1,5 +1,5 @@
 <template>
-  <gd-menu :active="active" label="Delete Device" class="gd-menu">
+  <gd-menu :active="active" label="Delete Function" class="gd-menu">
     <p class="gd-menu-message gd-caption-text">
       Warning! this action cannot be undone
     </p>
@@ -8,7 +8,7 @@
         @clicked="submit"
         :loading="submitLoading"
         style="width: 100%"
-        label="Delete device"
+        label="Delete function"
         type="error"
       />
     </div>
@@ -16,25 +16,22 @@
 </template>
 
 <script lang="ts" setup>
-  import type { Port } from "~/types/port";
-  import type { Relay } from "~/types/relay";
-  import type { Sensor } from "~/types/sensor";
+  import type { Function } from "~/types/function";
 
   const emits = defineEmits(["exit", "shake"]);
   const props = defineProps<{
     active: boolean;
-    port: Port;
-    device: Sensor | Relay;
+    function: Function;
   }>();
   const { closeMenu } = useMain();
-  const { deletePort } = usePort();
+  const { deleteFunction } = useFunction();
 
   const submitLoading = ref<boolean>(false);
 
   async function submit(): Promise<void> {
     submitLoading.value = true;
 
-    const result = await deletePort(props.port);
+    const result = await deleteFunction(props.function);
     setTimeout(() => {
       submitLoading.value = false;
       if (result) {

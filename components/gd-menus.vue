@@ -67,6 +67,54 @@
         :active="i === menusCopy.length - 1"
         @shake="emits('shake')"
       />
+      <gd-function-menu
+        v-if="menu['function']"
+        :sensors="menu['function'].sensors"
+        :relays="menu['function'].relays"
+        :functions="menu['function'].functions"
+        :active="i === menusCopy.length - 1"
+        @shake="emits('shake')"
+      />
+      <gd-function-information-menu
+        v-if="menu['functionInformation']"
+        :sensors="menu['functionInformation'].sensors"
+        :relays="menu['functionInformation'].relays"
+        :functions="menu['functionInformation'].functions"
+        :function="menu['functionInformation'].function"
+        :active="i === menusCopy.length - 1"
+        @shake="emits('shake')"
+      />
+      <gd-function-delete-menu
+        v-if="menu['functionDelete']"
+        :function="menu['functionDelete'].function"
+        :active="i === menusCopy.length - 1"
+        @shake="emits('shake')"
+      />
+      <gd-watcher-menu
+        v-if="menu['watcher']"
+        :sensors="menu['watcher'].sensors"
+        :relays="menu['watcher'].relays"
+        :functions="menu['watcher'].functions"
+        :watchers="menu['watcher'].watchers"
+        :active="i === menusCopy.length - 1"
+        @shake="emits('shake')"
+      />
+      <gd-watcher-information-menu
+        v-if="menu['watcherInformation']"
+        :sensors="menu['watcherInformation'].sensors"
+        :relays="menu['watcherInformation'].relays"
+        :functions="menu['watcherInformation'].functions"
+        :watchers="menu['watcherInformation'].watchers"
+        :watcher="menu['watcherInformation'].watcher"
+        :active="i === menusCopy.length - 1"
+        @shake="emits('shake')"
+      />
+      <gd-watcher-delete-menu
+        v-if="menu['watcherDelete']"
+        :watcher="menu['watcherDelete'].watcher"
+        :active="i === menusCopy.length - 1"
+        @shake="emits('shake')"
+      />
     </div>
   </div>
 </template>
