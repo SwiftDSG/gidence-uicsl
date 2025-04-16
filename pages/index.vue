@@ -65,7 +65,10 @@
                 @clicked="openMenu({ deviceInformation: { port } })"
               />
             </div>
-            <div class="gd-controller-port-body">
+            <div
+              v-if="devices[port.id]?.length"
+              class="gd-controller-port-body"
+            >
               <div
                 v-for="device in devices[port.id]"
                 class="gd-controller-port-device"
@@ -415,6 +418,7 @@
         }
       }
     }
+
     @media only screen and (min-width: 1281px) {
       width: calc(100% - 20rem);
     }
