@@ -90,9 +90,16 @@
         <div class="gd-function-task-input-wrapper">
           <gd-input-select
             :input="taskDeviceInput"
-            style="width: calc(100% - 6.5rem)"
+            style="width: calc((100% - 1rem) / 3)"
           />
-          <gd-input-select :input="taskDeviceValueInput" style="width: 6rem" />
+          <gd-input-select
+            :input="taskDeviceValueInput"
+            style="width: calc((100% - 1rem) / 3)"
+          />
+          <gd-input-select
+            :input="taskDeviceLockInput"
+            style="width: calc((100% - 1rem) / 3)"
+          />
         </div>
       </div>
     </div>
@@ -190,6 +197,25 @@
       },
     ],
   });
+  const taskDeviceLockInput = ref<InputSelectOption<boolean | "">>({
+    name: "task-command-device-lock",
+    placeholder: "Lock",
+    strict: true,
+    model: {
+      name: "",
+      value: "",
+    },
+    options: [
+      {
+        name: "Locked",
+        value: true,
+      },
+      {
+        name: "Unlocked",
+        value: false,
+      },
+    ],
+  });
 
   const kind = computed<FunctionTaskKind | "">(() => {
     return taskKindInput.value.model.value;
@@ -205,8 +231,9 @@
     );
     if (relay) {
       const value = taskDeviceValueInput.value.model.value;
+      const lock = taskDeviceLockInput.value.model.value;
       if (typeof value === "boolean") {
-        command.relay = [relay.id, value];
+        command.relay = [relay.id, value, lock || false];
         return command;
       }
     }
@@ -385,6 +412,10 @@
           taskDeviceValueInput.value.model = {
             name: comand[1] ? "On" : "Off",
             value: comand[1],
+          };
+          taskDeviceLockInput.value.model = {
+            name: comand[2] ? "Locked" : "Unlocked",
+            value: comand[2] || false,
           };
         }
       } else if (props.task.command.function) {

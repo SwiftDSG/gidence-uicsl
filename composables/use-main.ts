@@ -1,5 +1,5 @@
 
-import type { Cron } from "~/types/cron";
+import type { Scheduler } from "~/types/scheduler";
 import type { Function } from "~/types/function";
 import type { Port } from "~/types/port";
 import type { Relay } from "~/types/relay";
@@ -62,9 +62,9 @@ export default function () {
     if (!device.value) return;
     device.value.watcher[watcher.id] = watcher;
   }
-  const updateDeviceCron = (cron: Cron): void => {
+  const updateDeviceScheduler = (scheduler: Scheduler): void => {
     if (!device.value) return;
-    device.value.cron[cron.id] = cron;
+    device.value.scheduler[scheduler.id] = scheduler;
   }
   const updateReadingRelay = (relay: Relay, state: boolean): void => {
     if (!reading.value) return;
@@ -126,7 +126,7 @@ export default function () {
     updateDeviceRelay,
     updateDeviceFunction,
     updateDeviceWatcher,
-    updateDeviceCron,
+    updateDeviceScheduler,
     updateReadingRelay,
   };
 }

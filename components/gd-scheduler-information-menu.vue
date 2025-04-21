@@ -1,13 +1,13 @@
 <template>
   <gd-menu
     :active="active"
-    :label="cron ? 'Edit Scheduler' : 'Create Scheduler'"
+    :label="scheduler ? 'Edit Scheduler' : 'Create Scheduler'"
     class="gd-menu"
   >
     <div class="gd-menu-informations">
       <div class="gd-menu-informations-header">
         <span class="gd-menu-informations-title gd-headline-5">
-          Cron information
+          Scheduler information
         </span>
       </div>
       <div class="gd-menu-informations-body">
@@ -27,11 +27,26 @@
       </div>
       <div class="gd-menu-informations-body">
         <div class="gd-menu-input-wrapper">
-          <gd-input-text class="gd-menu-input-cron" :input="fieldInput[0]" />
-          <gd-input-text class="gd-menu-input-cron" :input="fieldInput[1]" />
-          <gd-input-text class="gd-menu-input-cron" :input="fieldInput[2]" />
-          <gd-input-text class="gd-menu-input-cron" :input="fieldInput[3]" />
-          <gd-input-text class="gd-menu-input-cron" :input="fieldInput[4]" />
+          <gd-input-text
+            class="gd-menu-input-scheduler"
+            :input="fieldInput[0]"
+          />
+          <gd-input-text
+            class="gd-menu-input-scheduler"
+            :input="fieldInput[1]"
+          />
+          <gd-input-text
+            class="gd-menu-input-scheduler"
+            :input="fieldInput[2]"
+          />
+          <gd-input-text
+            class="gd-menu-input-scheduler"
+            :input="fieldInput[3]"
+          />
+          <gd-input-text
+            class="gd-menu-input-scheduler"
+            :input="fieldInput[4]"
+          />
         </div>
       </div>
     </div>
@@ -39,7 +54,7 @@
     <div class="gd-menu-footer">
       <gd-input-button
         style="width: 100%"
-        :label="cron ? 'Update scheduler' : 'Save scheduler'"
+        :label="scheduler ? 'Update scheduler' : 'Save scheduler'"
         :disabled="!name || !function_id"
         :loading="submitLoading"
         @clicked="submit"
@@ -52,7 +67,7 @@
   import type { InputOption, InputSelectOption } from "~/types/general";
   import type { Sensor } from "~/types/sensor";
   import type { Relay } from "~/types/relay";
-  import type { Cron } from "~/types/cron";
+  import type { Scheduler } from "~/types/scheduler";
   import type { Function } from "~/types/function";
 
   const emits = defineEmits(["exit", "shake"]);
@@ -60,18 +75,18 @@
     active: boolean;
     sensors: Sensor[];
     relays: Relay[];
-    crons: Cron[];
+    schedulers: Scheduler[];
     functions: Function[];
-    cron?: Cron;
+    scheduler?: Scheduler;
   }>();
-  const { createCron, updateCron } = useCron();
-  const { closeMenu, updateDeviceCron } = useMain();
+  const { createScheduler, updateScheduler } = useScheduler();
+  const { closeMenu, updateDeviceScheduler } = useMain();
 
   const submitLoading = ref<boolean>(false);
 
   const nameInput = ref<InputOption>({
     name: "name",
-    label: "Cron name",
+    label: "Scheduler name",
     placeholder: "Emergency Conditions",
     model: {
       name: "",
@@ -93,7 +108,7 @@
     [InputOption, InputOption, InputOption, InputOption, InputOption]
   >([
     {
-      name: "cron-0",
+      name: "scheduler-0",
       placeholder: "*",
       alignment: "center",
       model: {
@@ -102,7 +117,7 @@
       },
     },
     {
-      name: "cron-1",
+      name: "scheduler-1",
       placeholder: "*",
       alignment: "center",
       model: {
@@ -111,7 +126,7 @@
       },
     },
     {
-      name: "cron-2",
+      name: "scheduler-2",
       placeholder: "*",
       alignment: "center",
       model: {
@@ -120,7 +135,7 @@
       },
     },
     {
-      name: "cron-3",
+      name: "scheduler-3",
       placeholder: "*",
       alignment: "center",
       model: {
@@ -129,7 +144,7 @@
       },
     },
     {
-      name: "cron-4",
+      name: "scheduler-4",
       placeholder: "*",
       alignment: "center",
       model: {
@@ -141,11 +156,11 @@
 
   const name = computed<string>(() => nameInput.value.model.value);
   const function_id = computed<string>(() => functionInput.value.model.value);
-  const field = computed<Cron["field"]>(() => {
-    // ControllerCronCron = [ControllerCronCronField?, ControllerCronCronField?, ControllerCronCronField?, ControllerCronCronField?, ControllerCronCronField?]
+  const field = computed<Scheduler["field"]>(() => {
+    // ControllerSchedulerScheduler = [ControllerSchedulerSchedulerField?, ControllerSchedulerSchedulerField?, ControllerSchedulerSchedulerField?, ControllerSchedulerSchedulerField?, ControllerSchedulerSchedulerField?]
     const inputs = fieldInput.value.map<string>((a) => a.model.value);
 
-    const fields: Cron["field"] = [
+    const fields: Scheduler["field"] = [
       undefined,
       undefined,
       undefined,
@@ -185,27 +200,27 @@
     }
   }
   async function submit() {
-    const payload: Cron = {
-      id: props.cron?.id || "",
+    const payload: Scheduler = {
+      id: props.scheduler?.id || "",
       name: name.value,
       function_id: function_id.value,
       field: field.value,
-      active: props.cron?.active || false,
+      active: props.scheduler?.active || false,
     };
 
     submitLoading.value = true;
 
     let result;
-    if (props.cron) {
-      result = await updateCron(payload);
+    if (props.scheduler) {
+      result = await updateScheduler(payload);
     } else {
-      result = await createCron(payload);
+      result = await createScheduler(payload);
     }
 
     setTimeout(() => {
       submitLoading.value = false;
       if (result) {
-        updateDeviceCron(result);
+        updateDeviceScheduler(result);
         closeMenu();
       } else {
         emits("shake");
@@ -216,10 +231,10 @@
   onMounted(() => {
     fillOptions(props.functions);
 
-    if (props.cron) {
-      const cron = props.cron.field;
-      for (let i = 0; i < cron.length; i++) {
-        const v = cron[i];
+    if (props.scheduler) {
+      const scheduler = props.scheduler.field;
+      for (let i = 0; i < scheduler.length; i++) {
+        const v = scheduler[i];
         if (v?.step) {
           fieldInput.value[i].model = {
             name: `${v.step[0]}/${v.step[1]}`,
@@ -240,14 +255,14 @@
       }
 
       nameInput.value.model = {
-        name: props.cron.name,
-        value: props.cron.name,
+        name: props.scheduler.name,
+        value: props.scheduler.name,
       };
       functionInput.value.model = {
         name:
-          props.functions.find((fn) => fn.id === props.cron?.function_id)
-            ?.name || props.cron.function_id,
-        value: props.cron.function_id,
+          props.functions.find((fn) => fn.id === props.scheduler?.function_id)
+            ?.name || props.scheduler.function_id,
+        value: props.scheduler.function_id,
       };
     }
   });
@@ -263,7 +278,7 @@
       position: relative;
       width: 100%;
       padding: 0.75rem;
-      border-radius: 0.5rem;
+      border-radius: 0.75rem;
       border: var(--border);
       box-sizing: border-box;
       background: var(--background-depth-one-color);
@@ -271,6 +286,12 @@
       display: flex;
       flex-direction: column;
       gap: 0.75rem;
+
+      .gd-menu-informations-header {
+        position: relative;
+        width: 100%;
+        display: flex;
+      }
 
       .gd-menu-informations-body {
         position: relative;
@@ -337,7 +358,7 @@
         width: 100%;
       }
 
-      .gd-menu-input-cron {
+      .gd-menu-input-scheduler {
         position: relative;
         width: calc((100% - 2rem) / 5);
       }

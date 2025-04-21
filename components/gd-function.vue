@@ -32,6 +32,7 @@
     function: Function;
   }>();
   const emits = defineEmits(["open", "delete"]);
+  const { getDevice } = useMain();
   const { executeFunction } = useFunction();
 
   const functionLoading = ref<boolean>(false);
@@ -40,6 +41,7 @@
     functionLoading.value = true;
 
     await executeFunction(props.function);
+    await getDevice();
 
     setTimeout(async () => {
       functionLoading.value = false;

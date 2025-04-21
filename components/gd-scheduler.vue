@@ -1,62 +1,62 @@
 <template>
-  <div class="gd-cron">
-    <div class="gd-cron-information-container" @click="emits('open')">
-      <span class="gd-cron-information-name gd-headline-5">{{
-        cron.name
+  <div class="gd-scheduler">
+    <div class="gd-scheduler-information-container" @click="emits('open')">
+      <span class="gd-scheduler-information-name gd-headline-5">{{
+        scheduler.name
       }}</span>
     </div>
-    <div class="gd-cron-action-container">
+    <div class="gd-scheduler-action-container">
       <gd-input-button-small
-        :tooltip="cron.active ? 'Disable cron' : 'Enable cron'"
+        :tooltip="scheduler.active ? 'Disable scheduler' : 'Enable scheduler'"
         icon="power"
         @clicked="toggle"
-        :loading="cronLoading"
-        :type="cron.active ? 'default' : 'primary'"
+        :loading="schedulerLoading"
+        :type="scheduler.active ? 'default' : 'primary'"
       />
       <gd-input-button-small
-        tooltip="Delete cron"
+        tooltip="Delete scheduler"
         icon="delete"
         type="error"
-        @clicked="emits('delete', cron)"
+        @clicked="emits('delete', scheduler)"
       />
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
-  import type { Cron } from "~/types/cron";
+  import type { Scheduler } from "~/types/scheduler";
 
   const props = defineProps<{
-    cron: Cron;
+    scheduler: Scheduler;
   }>();
   const emits = defineEmits(["open", "delete"]);
 
-  const { updateDeviceCron } = useMain();
-  const { updateCron } = useCron();
+  const { updateDeviceScheduler } = useMain();
+  const { updateScheduler } = useScheduler();
 
-  const cronLoading = ref<boolean>(false);
+  const schedulerLoading = ref<boolean>(false);
 
   async function toggle() {
-    cronLoading.value = true;
+    schedulerLoading.value = true;
 
     const payload = {
-      ...props.cron,
-      active: !props.cron.active,
+      ...props.scheduler,
+      active: !props.scheduler.active,
     };
 
-    const result = await updateCron(payload);
+    const result = await updateScheduler(payload);
 
     setTimeout(async () => {
       if (result) {
-        updateDeviceCron(result);
+        updateDeviceScheduler(result);
       }
-      cronLoading.value = false;
+      schedulerLoading.value = false;
     }, 500);
   }
 </script>
 
 <style lang="scss" scoped>
-  .gd-cron {
+  .gd-scheduler {
     position: relative;
     width: 100%;
     padding: 0.75rem;
@@ -68,7 +68,7 @@
     justify-content: space-between;
     align-items: center;
 
-    .gd-cron-information-container {
+    .gd-scheduler-information-container {
       cursor: pointer;
       position: relative;
       height: 100%;
@@ -80,7 +80,7 @@
       }
     }
 
-    .gd-cron-action-container {
+    .gd-scheduler-action-container {
       position: relative;
       display: flex;
       gap: 0.5rem;

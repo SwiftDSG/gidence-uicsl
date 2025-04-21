@@ -172,6 +172,12 @@
       flex-direction: column;
       gap: 0.75rem;
 
+      .gd-menu-informations-header {
+        position: relative;
+        width: 100%;
+        display: flex;
+      }
+
       .gd-menu-informations-body {
         position: relative;
         width: 100%;
@@ -237,7 +243,7 @@
         width: 100%;
       }
 
-      .gd-menu-input-cron {
+      .gd-menu-input-scheduler {
         position: relative;
         width: calc((100% - 2rem) / 5);
       }

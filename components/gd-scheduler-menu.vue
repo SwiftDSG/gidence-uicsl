@@ -4,23 +4,23 @@
       By creating a scheduler, you can decide when a function will be triggered.
       You will see your schedulers here.
     </p>
-    <div v-if="crons.length" class="gd-menu-crons">
-      <gd-cron
-        v-for="cron in crons"
-        :key="cron.id"
-        :cron="cron"
+    <div v-if="schedulers.length" class="gd-menu-schedulers">
+      <gd-scheduler
+        v-for="scheduler in schedulers"
+        :key="scheduler.id"
+        :scheduler="scheduler"
         @open="
           openMenu({
-            cronInformation: {
-              cron,
-              crons,
+            schedulerInformation: {
+              scheduler,
+              schedulers,
               sensors,
               relays,
               functions,
             },
           })
         "
-        @delete="(cron) => openMenu({ cronDelete: { cron } })"
+        @delete="(scheduler) => openMenu({ schedulerDelete: { scheduler } })"
       />
     </div>
     <gd-input-button
@@ -28,8 +28,8 @@
       type="background"
       @clicked="
         openMenu({
-          cronInformation: {
-            crons,
+          schedulerInformation: {
+            schedulers,
             sensors,
             relays,
             functions,
@@ -44,7 +44,7 @@
   import type { Function } from "~/types/function";
   import type { Relay } from "~/types/relay";
   import type { Sensor } from "~/types/sensor";
-  import type { Cron } from "~/types/cron";
+  import type { Scheduler } from "~/types/scheduler";
 
   const emits = defineEmits(["exit", "open", "edit"]);
   const props = defineProps<{
@@ -55,9 +55,9 @@
   }>();
   const { device, openMenu } = useMain();
 
-  const crons = computed<Cron[]>(() => {
+  const schedulers = computed<Scheduler[]>(() => {
     return device.value
-      ? Object.values(device.value.cron).sort((a, b) =>
+      ? Object.values(device.value.scheduler).sort((a, b) =>
           a.name.toLowerCase() > b.name.toLowerCase() ? 1 : -1
         )
       : [];
@@ -76,7 +76,7 @@
       margin-bottom: 1rem;
     }
 
-    .gd-menu-crons {
+    .gd-menu-schedulers {
       position: relative;
       width: 100%;
       margin-bottom: 1rem;

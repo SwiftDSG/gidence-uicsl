@@ -1,13 +1,13 @@
-import type { Cron } from "~~/types/cron";
+import type { Scheduler } from "~~/types/scheduler";
 
 export default () => {
   const { $fetch } = useNuxtApp();
   const config = useRuntimeConfig();
 
-  const createCron = async (fn: Cron): Promise<Cron | null> => {
+  const createScheduler = async (fn: Scheduler): Promise<Scheduler | null> => {
     try {
       const response: Response = await $fetch(
-        `${config.public.controllerBase}/cron`,
+        `${config.public.controllerBase}/scheduler`,
         "post",
         JSON.stringify(fn)
       );
@@ -19,10 +19,10 @@ export default () => {
       return null
     }
   };
-  const updateCron = async (fn: Cron): Promise<Cron | null> => {
+  const updateScheduler = async (fn: Scheduler): Promise<Scheduler | null> => {
     try {
       const response: Response = await $fetch(
-        `${config.public.controllerBase}/cron`,
+        `${config.public.controllerBase}/scheduler`,
         "put",
         JSON.stringify(fn)
       );
@@ -34,10 +34,10 @@ export default () => {
       return null
     }
   };
-  const deleteCron = async (fn: Cron): Promise<boolean> => {
+  const deleteScheduler = async (fn: Scheduler): Promise<boolean> => {
     try {
       const response: Response = await $fetch(
-        `${config.public.controllerBase}/cron/${fn.id}`,
+        `${config.public.controllerBase}/scheduler/${fn.id}`,
         "delete"
       );
       if (response.status !== 204) throw new Error("");
@@ -49,8 +49,8 @@ export default () => {
   };
 
   return {
-    createCron,
-    updateCron,
-    deleteCron,
+    createScheduler,
+    updateScheduler,
+    deleteScheduler,
   };
 };

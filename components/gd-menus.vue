@@ -113,27 +113,27 @@
         :active="i === menusCopy.length - 1"
         @shake="emits('shake')"
       />
-      <gd-cron-menu
-        v-if="menu['cron']"
-        :sensors="menu['cron'].sensors"
-        :relays="menu['cron'].relays"
-        :functions="menu['cron'].functions"
+      <gd-scheduler-menu
+        v-if="menu['scheduler']"
+        :sensors="menu['scheduler'].sensors"
+        :relays="menu['scheduler'].relays"
+        :functions="menu['scheduler'].functions"
         :active="i === menusCopy.length - 1"
         @shake="emits('shake')"
       />
-      <gd-cron-information-menu
-        v-if="menu['cronInformation']"
-        :sensors="menu['cronInformation'].sensors"
-        :relays="menu['cronInformation'].relays"
-        :functions="menu['cronInformation'].functions"
-        :crons="menu['cronInformation'].crons"
-        :cron="menu['cronInformation'].cron"
+      <gd-scheduler-information-menu
+        v-if="menu['schedulerInformation']"
+        :sensors="menu['schedulerInformation'].sensors"
+        :relays="menu['schedulerInformation'].relays"
+        :functions="menu['schedulerInformation'].functions"
+        :schedulers="menu['schedulerInformation'].schedulers"
+        :scheduler="menu['schedulerInformation'].scheduler"
         :active="i === menusCopy.length - 1"
         @shake="emits('shake')"
       />
-      <gd-cron-delete-menu
-        v-if="menu['cronDelete']"
-        :cron="menu['cronDelete'].cron"
+      <gd-scheduler-delete-menu
+        v-if="menu['schedulerDelete']"
+        :scheduler="menu['schedulerDelete'].scheduler"
         :active="i === menusCopy.length - 1"
         @shake="emits('shake')"
       />

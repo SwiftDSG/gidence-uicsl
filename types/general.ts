@@ -1,5 +1,5 @@
 import type { Controller } from "~/types/controller";
-import type { Cron } from "~/types/cron";
+import type { Scheduler } from "~/types/scheduler";
 import type { Port } from "~/types/port";
 import type { Relay } from "~/types/relay";
 import type { Sensor } from "~/types/sensor";
@@ -16,7 +16,7 @@ export type Device = {
   relay: { [k: string]: Relay };
   function: { [k: string]: Function };
   watcher: { [k: string]: Watcher };
-  cron: { [k: string]: Cron };
+  scheduler: { [k: string]: Scheduler };
 };
 export type Reading = {
   sensor: { [k: string]: [number, number]; }; // [value, timestamp]
@@ -82,20 +82,20 @@ export type Menu = {
   watcherDelete?: {
     watcher: Watcher;
   };
-  cron?: {
+  scheduler?: {
     sensors: Sensor[];
     relays: Relay[];
     functions: Function[];
   };
-  cronInformation?: {
+  schedulerInformation?: {
     sensors: Sensor[];
     relays: Relay[];
     functions: Function[];
-    crons: Cron[];
-    cron?: Cron;
+    schedulers: Scheduler[];
+    scheduler?: Scheduler;
   };
-  cronDelete?: {
-    cron: Cron;
+  schedulerDelete?: {
+    scheduler: Scheduler;
   };
 }
 

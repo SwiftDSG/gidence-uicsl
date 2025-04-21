@@ -100,7 +100,7 @@
         class="gd-menu-item"
         @click="
           openMenu({
-            cron: {
+            scheduler: {
               sensors,
               relays,
               functions,

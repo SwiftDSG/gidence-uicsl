@@ -1,5 +1,5 @@
 <template>
-  <gd-menu :active="active" label="Delete Cron" class="gd-menu">
+  <gd-menu :active="active" label="Delete Scheduler" class="gd-menu">
     <p class="gd-menu-message gd-caption-text">
       Warning! this action cannot be undone
     </p>
@@ -8,7 +8,7 @@
         @clicked="submit"
         :loading="submitLoading"
         style="width: 100%"
-        label="delete cron"
+        label="delete scheduler"
         type="error"
       />
     </div>
@@ -16,22 +16,22 @@
 </template>
 
 <script lang="ts" setup>
-  import type { Cron } from "~/types/cron";
+  import type { Scheduler } from "~/types/scheduler";
 
   const emits = defineEmits(["exit", "shake"]);
   const props = defineProps<{
     active: boolean;
-    cron: Cron;
+    scheduler: Scheduler;
   }>();
   const { closeMenu } = useMain();
-  const { deleteCron } = useCron();
+  const { deleteScheduler } = useScheduler();
 
   const submitLoading = ref<boolean>(false);
 
   async function submit(): Promise<void> {
     submitLoading.value = true;
 
-    const result = await deleteCron(props.cron);
+    const result = await deleteScheduler(props.scheduler);
     setTimeout(() => {
       submitLoading.value = false;
       if (result) {
