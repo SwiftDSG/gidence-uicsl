@@ -12,9 +12,6 @@
     @mousedown="mouseDownHandler"
     @keydown.space.enter="keyDownHandler"
   >
-    <div v-if="icon" class="gd-input-icon-container">
-      <gd-svg :name="icon" color="secondary" />
-    </div>
     <div class="gd-input-label-container">
       <label class="gd-input-label gd-button-text gd-input-label-decoy">
         {{ label }}
@@ -225,10 +222,10 @@
   button.gd-input-component {
     cursor: pointer;
     position: relative;
-    height: 2rem;
+    height: 1.5rem;
     display: flex;
     background: var(--primary-color);
-    border-radius: 0.5rem;
+    border-radius: 0.75rem;
     border: none;
     padding: 0;
     margin: 0;
@@ -326,7 +323,7 @@
       left: 0;
       width: 100%;
       height: 100%;
-      border-radius: 0.5rem;
+      border-radius: 0.75rem;
       border: 1px solid var(--primary-color);
       box-sizing: border-box;
       transition: 0.25s border-color, 0.25s border-width;
@@ -337,7 +334,7 @@
         left: -3px;
         width: calc(100% + 6px);
         height: calc(100% + 6px);
-        border-radius: 0.5rem;
+        border-radius: calc(0.75rem + 3px);
         border: 3px solid var(--primary-color);
         box-sizing: border-box;
         opacity: 0;
@@ -353,7 +350,7 @@
       width: 100%;
       height: 100%;
       background: rgba(0, 0, 0, 0.1);
-      border-radius: 0.5rem;
+      border-radius: 0.75rem;
       opacity: 0;
     }
 
@@ -365,24 +362,6 @@
 
     &.gd-input-component-animating {
       pointer-events: none !important;
-    }
-
-    &.gd-input-component-icon {
-      .gd-input-label-container {
-        width: calc(100% - 2rem);
-      }
-
-      .gd-input-icon-container {
-        position: relative;
-        width: 2rem;
-        height: 2rem;
-        background: rgba(0, 0, 0, 0.05);
-        padding: 0 0.5rem;
-        box-sizing: border-box;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-      }
     }
 
     &.gd-input-component-secondary {

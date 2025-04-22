@@ -22,30 +22,31 @@
     <div class="gd-menu-informations">
       <div class="gd-menu-informations-header">
         <span class="gd-menu-informations-title gd-headline-5">
-          Execution conditions
+          Daily rules
         </span>
       </div>
       <div class="gd-menu-informations-body">
-        <div class="gd-menu-input-wrapper">
-          <gd-input-text
-            class="gd-menu-input-scheduler"
-            :input="fieldInput[0]"
+        <div class="gd-menu-informations-tabs">
+          <gd-input-button-chip
+            v-for="(tab, i) in tabs"
+            :key="i"
+            :label="tab"
+            class="gd-menu-informations-tab"
+            :type="tabIndex === i ? 'primary' : 'background'"
+            @clicked="tabIndex = i"
           />
-          <gd-input-text
-            class="gd-menu-input-scheduler"
-            :input="fieldInput[1]"
+        </div>
+        <div class="gd-menu-information-rules">
+          <gd-scheduler-rule
+            v-for="(r, i) in rule[tabIndex]"
+            :rule="r"
+            :key="`${i}-${tabIndex}`"
+            @update="(r) => (rule[tabIndex][i] = r)"
+            @remove="rule[tabIndex].splice(i, 1)"
           />
-          <gd-input-text
-            class="gd-menu-input-scheduler"
-            :input="fieldInput[2]"
-          />
-          <gd-input-text
-            class="gd-menu-input-scheduler"
-            :input="fieldInput[3]"
-          />
-          <gd-input-text
-            class="gd-menu-input-scheduler"
-            :input="fieldInput[4]"
+          <gd-input-button
+            label="Add rule"
+            @clicked="rule[tabIndex].push({})"
           />
         </div>
       </div>
@@ -82,6 +83,10 @@
   const { createScheduler, updateScheduler } = useScheduler();
   const { closeMenu, updateDeviceScheduler } = useMain();
 
+  const tabs = ["S", "M", "T", "W", "T", "F", "S"];
+
+  const tabIndex = ref<number>(0);
+
   const submitLoading = ref<boolean>(false);
 
   const nameInput = ref<InputOption>({
@@ -104,92 +109,11 @@
     },
     options: [],
   });
-  const fieldInput = ref<
-    [InputOption, InputOption, InputOption, InputOption, InputOption]
-  >([
-    {
-      name: "scheduler-0",
-      placeholder: "*",
-      alignment: "center",
-      model: {
-        name: "*",
-        value: "*",
-      },
-    },
-    {
-      name: "scheduler-1",
-      placeholder: "*",
-      alignment: "center",
-      model: {
-        name: "*",
-        value: "*",
-      },
-    },
-    {
-      name: "scheduler-2",
-      placeholder: "*",
-      alignment: "center",
-      model: {
-        name: "*",
-        value: "*",
-      },
-    },
-    {
-      name: "scheduler-3",
-      placeholder: "*",
-      alignment: "center",
-      model: {
-        name: "*",
-        value: "*",
-      },
-    },
-    {
-      name: "scheduler-4",
-      placeholder: "*",
-      alignment: "center",
-      model: {
-        name: "*",
-        value: "*",
-      },
-    },
-  ]);
+
+  const rule = ref<Scheduler["rule"]>([[], [], [], [], [], [], []]);
 
   const name = computed<string>(() => nameInput.value.model.value);
   const function_id = computed<string>(() => functionInput.value.model.value);
-  const field = computed<Scheduler["field"]>(() => {
-    // ControllerSchedulerScheduler = [ControllerSchedulerSchedulerField?, ControllerSchedulerSchedulerField?, ControllerSchedulerSchedulerField?, ControllerSchedulerSchedulerField?, ControllerSchedulerSchedulerField?]
-    const inputs = fieldInput.value.map<string>((a) => a.model.value);
-
-    const fields: Scheduler["field"] = [
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-    ];
-
-    for (let i = 0; i < inputs.length; i++) {
-      if (inputs[i] !== "*" && inputs[i] !== "") {
-        if (inputs[i].includes("/")) {
-          const [start, end] = inputs[i].split("/");
-          fields[i] = {
-            step: [parseInt(start), parseInt(end)],
-          };
-        } else if (inputs[i].includes("-")) {
-          const [start, end] = inputs[i].split("-");
-          fields[i] = {
-            range: [parseInt(start), parseInt(end)],
-          };
-        } else {
-          fields[i] = {
-            value: parseInt(inputs[i]),
-          };
-        }
-      }
-    }
-
-    return fields;
-  });
 
   function fillOptions(datas: Function[]) {
     for (const fn of datas) {
@@ -204,7 +128,7 @@
       id: props.scheduler?.id || "",
       name: name.value,
       function_id: function_id.value,
-      field: field.value,
+      rule: rule.value,
       active: props.scheduler?.active || false,
     };
 
@@ -232,28 +156,6 @@
     fillOptions(props.functions);
 
     if (props.scheduler) {
-      const scheduler = props.scheduler.field;
-      for (let i = 0; i < scheduler.length; i++) {
-        const v = scheduler[i];
-        if (v?.step) {
-          fieldInput.value[i].model = {
-            name: `${v.step[0]}/${v.step[1]}`,
-            value: `${v.step[0]}/${v.step[1]}`,
-          };
-        } else if (v?.range) {
-          fieldInput.value[i].model = {
-            name: `${v.range[0]}-${v.range[1]}`,
-            value: `${v.range[0]}-${v.range[1]}`,
-          };
-        } else if (v && (v.value || 0) >= 0) {
-          const value = v.value || 0;
-          fieldInput.value[i].model = {
-            name: value.toString(),
-            value: value.toString(),
-          };
-        }
-      }
-
       nameInput.value.model = {
         name: props.scheduler.name,
         value: props.scheduler.name,
@@ -264,6 +166,8 @@
             ?.name || props.scheduler.function_id,
         value: props.scheduler.function_id,
       };
+
+      rule.value = props.scheduler.rule;
     }
   });
 </script>
@@ -299,6 +203,29 @@
         display: flex;
         flex-direction: column;
         gap: 0.75rem;
+
+        .gd-menu-informations-tabs {
+          position: relative;
+          width: 100%;
+          display: flex;
+          gap: 0.25rem;
+          justify-content: center;
+          align-items: center;
+
+          .gd-menu-informations-tab {
+            cursor: pointer;
+            position: relative;
+            width: 100%;
+          }
+        }
+
+        .gd-menu-information-rules {
+          position: relative;
+          width: 100%;
+          display: flex;
+          flex-direction: column;
+          gap: 0.75rem;
+        }
       }
 
       .gd-menu-information {

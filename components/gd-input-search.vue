@@ -37,7 +37,7 @@
     position: relative;
     width: 15rem;
     height: 2rem;
-    background: var(--background-depth-one-color);
+    background: var(--background-depth-two-color);
     border-radius: 0.5rem;
     display: flex;
     align-items: center;

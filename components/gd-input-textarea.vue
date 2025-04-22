@@ -107,7 +107,7 @@
       position: relative;
       width: 100%;
       height: 5rem;
-      background: var(--background-depth-one-color);
+      background: var(--background-depth-two-color);
       border-radius: 0.5rem;
       display: flex;
       align-items: center;

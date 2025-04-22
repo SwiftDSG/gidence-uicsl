@@ -3,11 +3,10 @@ export type Scheduler = {
   function_id: string;
   name: string;
   active: boolean;
-  field: [SchedulerField?, SchedulerField?, SchedulerField?, SchedulerField?, SchedulerField?];
+  rule: [SchedulerRule[], SchedulerRule[], SchedulerRule[], SchedulerRule[], SchedulerRule[], SchedulerRule[], SchedulerRule[]];
 }
 
-export type SchedulerField = {
-  range?: [number, number];
-  step?: [number, number];
-  value?: number;
+export type SchedulerRule = {
+  value?: [number, number];
+  interval?: [[number, number], [number, number], number];
 }

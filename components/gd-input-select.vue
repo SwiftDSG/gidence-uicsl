@@ -386,7 +386,7 @@
       position: relative;
       width: 100%;
       height: 2rem;
-      background: var(--background-depth-one-color);
+      background: var(--background-depth-two-color);
       border-radius: 0.5rem;
       display: flex;
       align-items: center;
@@ -525,16 +525,6 @@
 
     .gd-input-options {
       top: calc(100% + 2px);
-
-      span.gd-input-empty {
-        pointer-events: none;
-        position: relative;
-        width: 100%;
-        height: 2rem;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-      }
     }
 
     &.gd-input-error {
@@ -577,6 +567,16 @@
 </style>
 
 <style lang="scss">
+  span.gd-input-empty {
+    pointer-events: none;
+    position: relative;
+    width: 100%;
+    height: 2rem;
+    color: #f0f0f0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
   .gd-input-option {
     cursor: pointer;
     position: relative;
