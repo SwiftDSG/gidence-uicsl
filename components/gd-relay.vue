@@ -178,7 +178,9 @@
       .gd-relay-header {
         .gd-relay-information-container {
           .gd-relay-information-icon-container {
-            animation: gd-rotate 1s linear infinite;
+            .gd-relay-information-icon {
+              animation: gd-rotate 1s linear infinite;
+            }
           }
         }
       }
