@@ -198,7 +198,8 @@
   });
 
   async function refresh() {
-    if (!(await getReading())) {
+    const [_, reading] = await Promise.all([getDevice(), getReading()]);
+    if (!reading) {
       refreshFailedCount.value += 1;
       if (refreshFailedCount.value === 5) {
         online.value = false;
