@@ -8,10 +8,7 @@
     <div class="gd-relay-header">
       <div class="gd-relay-information-container" @click="emits('select')">
         <div class="gd-relay-information-icon-container">
-          <gd-svg
-            class="gd-relay-information-icon"
-            :name="reading?.[0] ? 'relay-on' : 'relay-off'"
-          />
+          <gd-svg class="gd-relay-information-icon" name="fan" />
         </div>
         <div class="gd-relay-information">
           <span class="gd-relay-information-name gd-headline-5">{{
@@ -178,6 +175,13 @@
     }
 
     &.gd-relay-on {
+      .gd-relay-header {
+        .gd-relay-information-container {
+          .gd-relay-information-icon-container {
+            animation: gd-rotate 1s linear infinite;
+          }
+        }
+      }
       .gd-relay-body {
         .gd-relay-value-container {
           color: var(--success-color);
