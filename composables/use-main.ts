@@ -44,27 +44,45 @@ export default function () {
 
   const updateDevicePort = (port: Port): void => {
     if (!device.value) return;
-    device.value.port[port.id] = port;
+    const index = device.value.port.findIndex((p) => p.id === port.id);
+    if (index !== -1) {
+      device.value.port[index] = port;
+    }
   }
   const updateDeviceSensor = (sensor: Sensor): void => {
     if (!device.value) return;
-    device.value.sensor[sensor.id] = sensor;
+    const index = device.value.sensor.findIndex((s) => s.id === sensor.id);
+    if (index !== -1) {
+      device.value.sensor[index] = sensor;
+    }
   }
   const updateDeviceRelay = (relay: Relay): void => {
     if (!device.value) return;
-    device.value.relay[relay.id] = relay;
+    const index = device.value.relay.findIndex((r) => r.id === relay.id);
+    if (index !== -1) {
+      device.value.relay[index] = relay;
+    }
   }
   const updateDeviceFunction = (fn: Function): void => {
     if (!device.value) return;
-    device.value.function[fn.id] = fn;
+    const index = device.value.function.findIndex((f) => f.id === fn.id);
+    if (index !== -1) {
+      device.value.function[index] = fn;
+    }
   }
   const updateDeviceWatcher = (watcher: Watcher): void => {
     if (!device.value) return;
-    device.value.watcher[watcher.id] = watcher;
+    const index = device.value.watcher.findIndex((w) => w.id === watcher.id);
+    if (index !== -1) {
+      device.value.watcher[index] = watcher;
+    }
   }
   const updateDeviceScheduler = (scheduler: Scheduler): void => {
     if (!device.value) return;
-    device.value.scheduler[scheduler.id] = scheduler;
+    const index = device.value.scheduler.findIndex((s) => s.id === scheduler.id);
+    if (index !== -1) {
+      device.value.scheduler[index] = scheduler;
+    }
   }
   const updateReadingRelay = (relay: Relay, state: boolean): void => {
     if (!reading.value) return;

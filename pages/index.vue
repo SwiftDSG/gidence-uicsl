@@ -36,65 +36,14 @@
           </div>
         </div>
         <div class="gd-controller-body">
-          <div
+          <gd-port
             v-for="port in ports"
-            class="gd-controller-port"
-            :class="
-              instrumentSelected === port.id ? 'gd-controller-port-active' : ''
-            "
             :key="port.id"
-          >
-            <div class="gd-controller-port-header">
-              <div
-                class="gd-controller-port-information-container"
-                @click="openMenu({ port: { port } })"
-              >
-                <span class="gd-controller-port-information gd-headline-4">
-                  {{ port.name }}
-                </span>
-                <span
-                  class="gd-controller-port-information-description gd-caption-text"
-                >
-                  {{ `${port.address.host.join(".")}:${port.address.port}` }}
-                </span>
-              </div>
-              <gd-input-button
-                label="add device"
-                type="background"
-                :radius="0.75"
-                @clicked="openMenu({ deviceInformation: { port } })"
-              />
-            </div>
-            <div
-              v-if="devices[port.id]?.length"
-              class="gd-controller-port-body"
-            >
-              <div
-                v-for="device in devices[port.id]"
-                class="gd-controller-port-device"
-                :key="device.sensor?.id || device.relay?.id || ''"
-              >
-                <gd-sensor
-                  v-if="device.sensor && reading"
-                  :selected="instrumentSelected === device.sensor.id"
-                  :sensor="device.sensor"
-                  :reading="reading.sensor[device.sensor.id]"
-                  @select="
-                    openMenu({ sensor: { sensor: device.sensor, port: port } })
-                  "
-                />
-                <gd-relay
-                  v-if="device.relay && reading"
-                  :selected="instrumentSelected === device.relay.id"
-                  :relay="device.relay"
-                  :reading="reading.relay[device.relay.id]"
-                  @select="
-                    openMenu({ relay: { relay: device.relay, port: port } })
-                  "
-                />
-              </div>
-            </div>
-          </div>
+            :port="port"
+            :devices="devices[port.id]"
+            :selected="instrumentSelected"
+            @select="openMenu({ port: { port } })"
+          />
           <div class="gd-controller-actions">
             <gd-input-button
               label="add port"
@@ -133,9 +82,7 @@
   const online = ref<boolean>(false);
   const refreshFailedCount = ref<number>(0);
 
-  const ports = computed<Port[]>(() =>
-    device.value ? Object.values(device.value.port) : []
-  );
+  const ports = computed<Port[]>(() => (device.value ? device.value.port : []));
   const devices = computed<{
     [key: string]: {
       sensor?: Sensor;
@@ -151,13 +98,13 @@
         relay?: Relay;
       }[];
     } = {};
-    for (const sensor of Object.values(device.value.sensor)) {
+    for (const sensor of device.value.sensor) {
       if (!devices[sensor.port_id]) {
         devices[sensor.port_id] = [];
       }
       devices[sensor.port_id].push({ sensor });
     }
-    for (const relay of Object.values(device.value.relay)) {
+    for (const relay of device.value.relay) {
       if (!devices[relay.port_id]) {
         devices[relay.port_id] = [];
       }
@@ -223,7 +170,6 @@
   );
 
   onMounted(async () => {
-    await getDevice();
     await refresh();
 
     if (view.value === "desktop" && device.value) {
@@ -341,82 +287,6 @@
         flex-direction: column;
         align-items: center;
         gap: 1rem;
-
-        .gd-controller-port {
-          position: relative;
-          width: 100%;
-          background: var(--background-depth-two-color);
-          padding: 1rem;
-          border: var(--border);
-          border-radius: 1rem;
-          box-sizing: border-box;
-          display: flex;
-          flex-direction: column;
-          gap: 0.75rem;
-
-          .gd-controller-port-header {
-            position: relative;
-            width: 100%;
-            display: flex;
-            justify-content: space-between;
-
-            .gd-controller-port-information-container {
-              cursor: pointer;
-              position: relative;
-              height: 2rem;
-
-              span {
-                white-space: nowrap;
-              }
-
-              span:first-child {
-                position: absolute;
-                top: 0;
-              }
-
-              span:last-child {
-                position: absolute;
-                bottom: 0;
-              }
-            }
-          }
-
-          .gd-controller-port-body {
-            position: relative;
-            width: 100%;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.75rem;
-
-            .gd-controller-port-device {
-              position: relative;
-              width: calc((100% - 2.25rem) / 4);
-              background: var(--background-depth-one-color);
-              border: var(--border);
-              border-radius: 0.75rem;
-              box-sizing: border-box;
-            }
-          }
-
-          &::before {
-            content: "";
-            position: absolute;
-            top: -3px;
-            left: -3px;
-            width: calc(100% + 6px);
-            height: calc(100% + 6px);
-            border: 2px solid var(--primary-color);
-            border-radius: calc(1rem + 2px);
-            box-sizing: border-box;
-            box-shadow: 0 0 6px 0 var(--primary-color);
-            opacity: 0;
-            transition: opacity 0.25s ease-in-out;
-          }
-
-          &.gd-controller-port-active::before {
-            opacity: 1;
-          }
-        }
       }
     }
 
@@ -433,16 +303,6 @@
           .gd-controller-status-container {
             width: 100%;
             justify-content: space-between;
-          }
-        }
-
-        .gd-controller-body {
-          .gd-controller-port {
-            .gd-controller-port-body {
-              .gd-controller-port-device {
-                width: 100%;
-              }
-            }
           }
         }
       }

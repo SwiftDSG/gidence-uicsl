@@ -11,12 +11,12 @@ export type Theme = "light" | "dark";
 export type State = "idle" | "changing";
 export type Device = {
   controller: Controller;
-  port: { [k: string]: Port };
-  sensor: { [k: string]: Sensor };
-  relay: { [k: string]: Relay };
-  function: { [k: string]: Function };
-  watcher: { [k: string]: Watcher };
-  scheduler: { [k: string]: Scheduler };
+  port: Port[];
+  sensor: Sensor[];
+  relay: Relay[];
+  function: Function[];
+  watcher: Watcher[];
+  scheduler: Scheduler[];
 };
 export type Reading = {
   sensor: { [k: string]: [number, number]; }; // [value, timestamp]
