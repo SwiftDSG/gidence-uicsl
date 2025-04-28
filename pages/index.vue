@@ -82,58 +82,13 @@
   const online = ref<boolean>(false);
   const refreshFailedCount = ref<number>(0);
 
-  const ports = computed<Port[]>(() => {
-    if (!device.value) return [];
-
-    // Sort the ports based on order
-    const o = Object.keys(order.value);
-    const v = device.value.port;
-    let u = o.length;
-    for (let i = 0; i < v.length; i++) {
-      const j = o.findIndex((a) => v[i].id === a);
-      if (j > -1) {
-        const t = v[j];
-        v[j] = v[i];
-        v[i] = t;
-      } else {
-        const t = v[u];
-        v[u] = v[i];
-        v[i] = t;
-        u += 1;
-      }
-    }
-
-    return v;
-  });
-  const devices = computed<{
+  const ports = ref<Port[]>([]);
+  const devices = ref<{
     [key: string]: {
       sensor?: Sensor;
       relay?: Relay;
     }[];
-  }>(() => {
-    if (!device.value) {
-      return {};
-    }
-    const devices: {
-      [key: string]: {
-        sensor?: Sensor;
-        relay?: Relay;
-      }[];
-    } = {};
-    for (const sensor of device.value.sensor) {
-      if (!devices[sensor.port_id]) {
-        devices[sensor.port_id] = [];
-      }
-      devices[sensor.port_id].push({ sensor });
-    }
-    for (const relay of device.value.relay) {
-      if (!devices[relay.port_id]) {
-        devices[relay.port_id] = [];
-      }
-      devices[relay.port_id].push({ relay });
-    }
-    return devices;
-  });
+  }>({});
 
   const instrumentSelected = computed<string | null>(() => {
     if (!menus.value || menus.value.length === 0) {
@@ -189,6 +144,46 @@
         });
       }
     }
+  );
+  watch(
+    () => device.value,
+    (val) => {
+      if (!val) return [];
+
+      // Sort the ports based on order
+      const o = Object.keys(order.value);
+      const v = val.port;
+      let u = o.length;
+      for (let i = 0; i < v.length; i++) {
+        const j = o.findIndex((a) => v[i].id === a);
+        if (j > -1) {
+          const t = v[j];
+          v[j] = v[i];
+          v[i] = t;
+        } else {
+          const t = v[u];
+          v[u] = v[i];
+          v[i] = t;
+          u += 1;
+        }
+      }
+
+      ports.value = v;
+
+      for (const sensor of val.sensor) {
+        if (!devices.value[sensor.port_id]) {
+          devices.value[sensor.port_id] = [];
+        }
+        devices.value[sensor.port_id].push({ sensor });
+      }
+      for (const relay of val.relay) {
+        if (!devices.value[relay.port_id]) {
+          devices.value[relay.port_id] = [];
+        }
+        devices.value[relay.port_id].push({ relay });
+      }
+    },
+    { deep: true }
   );
 
   onMounted(async () => {
