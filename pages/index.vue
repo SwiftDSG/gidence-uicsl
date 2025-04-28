@@ -75,14 +75,36 @@
 
   const emits = defineEmits(["shake"]);
 
-  const { view, device, reading, menus, openMenu, getDevice, getReading } =
+  const { view, device, order, menus, openMenu, getDevice, getReading } =
     useMain();
 
   const loading = ref<boolean>(true);
   const online = ref<boolean>(false);
   const refreshFailedCount = ref<number>(0);
 
-  const ports = computed<Port[]>(() => (device.value ? device.value.port : []));
+  const ports = computed<Port[]>(() => {
+    if (!device.value) return [];
+
+    // Sort the ports based on order
+    const o = Object.keys(order.value);
+    const v = device.value.port;
+    let u = o.length;
+    for (let i = 0; i < v.length; i++) {
+      const j = o.findIndex((a) => v[i].id === a);
+      if (j > -1) {
+        const t = v[j];
+        v[j] = v[i];
+        v[i] = t;
+      } else {
+        const t = v[u];
+        v[u] = v[i];
+        v[i] = t;
+        u += 1;
+      }
+    }
+
+    return v;
+  });
   const devices = computed<{
     [key: string]: {
       sensor?: Sensor;

@@ -7,6 +7,8 @@ import type { Sensor } from "~/types/sensor";
 import type { Watcher } from "~/types/watcher";
 import type { Device, Menu, Reading, State, Theme, View } from "~~/types/general";
 
+type Order = { [k: string]: string[] }
+
 export default function () {
   const { $fetch } = useNuxtApp();
   const config = useRuntimeConfig();
@@ -19,6 +21,7 @@ export default function () {
   const menus = useState<Menu[]>("menus", () => []);
   const device = useState<Device | null>("device", () => null);
   const reading = useState<Reading | null>("reading", () => null);
+  const order = useState<Order>("order", () => ({}))
 
   const getTheme = (): Theme => {
     const stored = localStorage?.getItem("theme") || "";
@@ -133,6 +136,7 @@ export default function () {
     menus,
     device,
     reading,
+    order,
     getTheme,
     setTheme,
     openMenu,
