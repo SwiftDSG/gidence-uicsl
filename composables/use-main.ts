@@ -100,9 +100,13 @@ export default function () {
       );
       if (response.status !== 200) throw new Error("");
 
-      const result = await response.json();
+      const result: Device = await response.json();
 
-      device.value = result;
+      // Compare if there are any changes in the device object
+      if (device.value) {
+        const isEqual = JSON.stringify(device.value) === JSON.stringify(result);
+        if (isEqual) return device.value;
+      }
 
       return result
     } catch (e) {

@@ -148,6 +148,7 @@
   watch(
     () => device.value,
     (val) => {
+      console.log(val)
       if (!val) return [];
 
       // Sort the ports based on order
