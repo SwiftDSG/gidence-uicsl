@@ -92,7 +92,15 @@ export default function () {
     reading.value.relay[relay.id] = [!state, Date.now()];
   }
 
-  const getDevice = async (): Promise<Device | null> => {
+  const getDevice = async (): Promise<{
+    port: Port[];
+    device: {
+      [k: string]: {
+        sensor?: Sensor;
+        relay?: Relay;
+      }[] 
+    };
+  } | null> => {
     try {
       const response: Response = await $fetch(
         `${config.public.controllerBase}/device`,
@@ -102,13 +110,86 @@ export default function () {
 
       const result: Device = await response.json();
 
-      // Compare if there are any changes in the device object
       if (device.value) {
-        const isEqual = JSON.stringify(device.value) === JSON.stringify(result);
-        if (isEqual) return device.value;
+        if (JSON.stringify(device.value) !== JSON.stringify(result)) {
+          device.value = result;
+        } else {
+          throw new Error("");
+        }
+      } else {
+        device.value = result;
       }
 
-      return result
+      const o: Order = JSON.parse(JSON.stringify(order.value));
+      const k = Object.keys(o);
+      const p = result.port;
+      let u = k.length;
+      for (let i = 0; i < p.length; i++) {
+        const j = k.findIndex((a) => p[i].id === a);
+        if (j > -1) {
+          const t = p[j];
+          p[j] = p[i];
+          p[i] = t;
+        } else {
+          const t = p[u];
+          p[u] = p[i];
+          p[i] = t;
+          u += 1;
+          o[p[i].id] = [];
+        }
+      }
+
+      const d: { [k: string]: {
+        sensor?: Sensor;
+        relay?: Relay;
+      }[] } = {};
+      for (const sensor of result.sensor) {
+        if (!d[sensor.port_id]) {
+          if (!o[sensor.port_id]) {
+            o[sensor.port_id] = [];
+            d[sensor.port_id] = [];
+          } else {
+            d[sensor.port_id] = Array(o[sensor.port_id].length).fill({});
+          }
+        }
+        const j = o[sensor.port_id]?.findIndex(
+          (a) => a === sensor.id
+        ) || -1;
+
+        if (j > -1) {
+          d[sensor.port_id][j] = { sensor };
+        } else {
+          d[sensor.port_id].push({ sensor });
+          o[sensor.port_id].push(sensor.id);
+        }
+      }
+      for (const relay of result.relay) {
+        if (!d[relay.port_id]) {
+          if (!o[relay.port_id]) {
+            o[relay.port_id] = [];
+            d[relay.port_id] = [];
+          } else {
+            d[relay.port_id] = Array(o[relay.port_id].length).fill({});
+          }
+        }
+        const j = o[relay.port_id]?.findIndex(
+          (a) => a === relay.id
+        ) || -1;
+
+        if (j > -1) {
+          d[relay.port_id][j] = { relay };
+        } else {
+          d[relay.port_id].push({ relay });
+          o[relay.port_id].push(relay.id);
+        }
+      }
+
+      order.value = o;
+
+      return {
+        port: p,
+        device: d,
+      };
     } catch (e) {
       return null;
     }

@@ -122,7 +122,11 @@
   });
 
   async function refresh() {
-    const [_, reading] = await Promise.all([getDevice(), getReading()]);
+    const [device, reading] = await Promise.all([getDevice(), getReading()]);
+    if (device) {
+      ports.value = device.port;
+      devices.value = device.device;
+    }
     if (!reading) {
       refreshFailedCount.value += 1;
       if (refreshFailedCount.value === 5) {
@@ -146,43 +150,9 @@
     }
   );
   watch(
-    () => device.value,
+    () => order.value,
     (val) => {
       console.log(val)
-      if (!val) return [];
-
-      // Sort the ports based on order
-      const o = Object.keys(order.value);
-      const v = val.port;
-      let u = o.length;
-      for (let i = 0; i < v.length; i++) {
-        const j = o.findIndex((a) => v[i].id === a);
-        if (j > -1) {
-          const t = v[j];
-          v[j] = v[i];
-          v[i] = t;
-        } else {
-          const t = v[u];
-          v[u] = v[i];
-          v[i] = t;
-          u += 1;
-        }
-      }
-
-      ports.value = v;
-
-      for (const sensor of val.sensor) {
-        if (!devices.value[sensor.port_id]) {
-          devices.value[sensor.port_id] = [];
-        }
-        devices.value[sensor.port_id].push({ sensor });
-      }
-      for (const relay of val.relay) {
-        if (!devices.value[relay.port_id]) {
-          devices.value[relay.port_id] = [];
-        }
-        devices.value[relay.port_id].push({ relay });
-      }
     },
     { deep: true }
   );
