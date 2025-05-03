@@ -27,7 +27,12 @@
       <div
         v-for="device in devices"
         class="gd-port-device"
+        :class="dragId && dragId !== (device.sensor?.id || device.relay?.id || '') ? 'gd-port-device-dragging' : ''"
         :key="device.sensor?.id || device.relay?.id || ''"
+        :data-id="id"
+        :data-device-id="device.sensor?.id || device.relay?.id || ''"
+        :onmousedown="mouseDown"
+        :onmouseup="changePosition"
       >
         <gd-sensor
           v-if="device.sensor && reading"
@@ -35,7 +40,6 @@
           :sensor="device.sensor"
           :reading="reading.sensor[device.sensor.id]"
           @select="openMenu({ sensor: { sensor: device.sensor, port: port } })"
-          :onmousedown="mouseDown"
         />
         <gd-relay
           v-if="device.relay && reading"
@@ -43,8 +47,8 @@
           :relay="device.relay"
           :reading="reading.relay[device.relay.id]"
           @select="openMenu({ relay: { relay: device.relay, port: port } })"
-          :onmousedown="mouseDown"
         />
+        <div class="gd-port-device-overlay"></div>
       </div>
     </div>
   </div>
@@ -55,7 +59,7 @@
   import type { Relay } from "~/types/relay";
   import type { Sensor } from "~/types/sensor";
 
-  defineProps<{
+  const props = defineProps<{
     port: Port;
     devices: {
       sensor?: Sensor;
@@ -63,20 +67,103 @@
     }[];
     selected: string | null;
   }>();
-  const { reading, openMenu } = useMain();
+  const { reading, order, openMenu } = useMain();
+
+  const gdTarget = ref<HTMLElement | null>(null);
+
+  const mouseY = ref<number>(0);
+  const mouseX = ref<number>(0);
+
+  const dragId = ref<string>("");
+
+  const id = computed<string>(() => props.port.id);
 
   function mouseDown(e: MouseEvent) {
     e.stopPropagation();
+
+    let depth = 0;
+    let gdCurrentTarget = e.currentTarget as HTMLElement;
+    while (gdCurrentTarget.dataset.id !== id.value && depth < 8) {
+      gdCurrentTarget = gdCurrentTarget.parentElement as HTMLElement;
+      depth++;
+    }
+
+    if (depth >= 8) {
+      return;
+    }
+
+    gdTarget.value = gdCurrentTarget;
+
+    mouseX.value = e.clientX;
+    mouseY.value = e.clientY;
+
     window.addEventListener("mousemove", mouseMove);
     window.addEventListener("mouseup", mouseUp);
   }
   function mouseMove(e: MouseEvent) {
     e.stopPropagation();
+
+    // Move the element relative to the mouse position, using translate
+    if (!gdTarget.value) {
+      return;
+    }
+
+    dragId.value = gdTarget.value.dataset.deviceId;
+    gdTarget.value.style.pointerEvents = "none";
+
+    const rect = gdTarget.value.getBoundingClientRect();
+
+    const x = e.clientX - mouseX.value;
+    const y = e.clientY - mouseY.value;
+
+    gdTarget.value.style.transform = `translate(${x}px, ${y}px)`;
+    gdTarget.value.style.zIndex = "1000";
   }
   function mouseUp(e: MouseEvent) {
-    e.stopPropagation();
+    // Reset the element's position and remove the event listeners
     window.removeEventListener("mousemove", mouseMove);
     window.removeEventListener("mouseup", mouseUp);
+
+    if (!gdTarget.value) {
+      return;
+    }
+
+    gdTarget.value.removeAttribute("style");
+    gdTarget.value = null;
+    dragId.value = "";
+
+    mouseX.value = 0;
+    mouseY.value = 0;
+  }
+  function changePosition(e: MouseEvent) {
+    if (!gdTarget.value) {
+      return;
+    }
+
+    const targetIndex = props.devices.findIndex(
+      (device) => (device.sensor?.id || device.relay?.id) === dragId.value
+    );
+    if (targetIndex === -1) {
+      return;
+    }
+
+    const newIndex = props.devices.findIndex(
+      (device) => (device.sensor?.id || device.relay?.id) === e.currentTarget.dataset.deviceId
+    );
+    if (newIndex === -1) {
+      return;
+    }
+
+    const temp = props.devices[targetIndex];
+    props.devices[targetIndex] = props.devices[newIndex];
+    props.devices[newIndex] = temp;
+
+    // Change order
+    const orderCopy = JSON.parse(JSON.stringify(order.value[id.value]));
+    const tempOrder = orderCopy[targetIndex];
+    orderCopy[targetIndex] = orderCopy[newIndex];
+    orderCopy[newIndex] = tempOrder;
+    order.value[id.value] = orderCopy;
   }
 </script>
 
@@ -128,12 +215,46 @@
       gap: 0.75rem;
 
       .gd-port-device {
+        user-select: none;
         position: relative;
         width: calc((100% - 2.25rem) / 4);
+        height: 5.5rem;
         background: var(--background-depth-one-color);
         border: var(--border);
         border-radius: 0.75rem;
         box-sizing: border-box;
+
+        .gd-port-device-overlay {
+          pointer-events: none;
+          position: absolute;
+          top: -1px;
+          left: -1px;
+          width: calc(100% + 2px);
+          height: calc(100% + 2px);
+          border-radius: 0.75rem;
+          border: 2px solid var(--primary-color);
+          box-sizing: border-box;
+          opacity: 0;
+          backdrop-filter: blur(10px);
+
+          &::after {
+            content: "";
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: block;
+            background: var(--primary-color);
+            opacity: 0.2;
+            border-radius: 0.75rem;
+          }
+        }
+
+        &.gd-port-device-dragging {
+          .gd-port-device-overlay {
+            pointer-events: auto;
+            opacity: 1;
+          }
+        }
       }
     }
 
