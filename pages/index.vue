@@ -152,7 +152,11 @@
   watch(
     () => order.value,
     (val) => {
-      console.log(val)
+      if (!val) {
+        return;
+      }
+      console.log(val);
+      localStorage.setItem("order", JSON.stringify(val));
     },
     { deep: true }
   );

@@ -120,6 +120,13 @@ export default function () {
         device.value = result;
       }
 
+      const orderRaw = localStorage.getItem("order");
+      if (orderRaw) {
+        order.value = JSON.parse(orderRaw);
+      } else {
+        order.value = {};
+      }
+
       const o: Order = JSON.parse(JSON.stringify(order.value));
       const k = Object.keys(o);
       const p = result.port;
