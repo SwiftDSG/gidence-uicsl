@@ -35,6 +35,7 @@
           :sensor="device.sensor"
           :reading="reading.sensor[device.sensor.id]"
           @select="openMenu({ sensor: { sensor: device.sensor, port: port } })"
+          :onmousedown="mouseDown"
         />
         <gd-relay
           v-if="device.relay && reading"
@@ -42,6 +43,7 @@
           :relay="device.relay"
           :reading="reading.relay[device.relay.id]"
           @select="openMenu({ relay: { relay: device.relay, port: port } })"
+          :onmousedown="mouseDown"
         />
       </div>
     </div>
@@ -62,6 +64,20 @@
     selected: string | null;
   }>();
   const { reading, openMenu } = useMain();
+
+  function mouseDown(e: MouseEvent) {
+    e.stopPropagation();
+    window.addEventListener("mousemove", mouseMove);
+    window.addEventListener("mouseup", mouseUp);
+  }
+  function mouseMove(e: MouseEvent) {
+    e.stopPropagation();
+  }
+  function mouseUp(e: MouseEvent) {
+    e.stopPropagation();
+    window.removeEventListener("mousemove", mouseMove);
+    window.removeEventListener("mouseup", mouseUp);
+  }
 </script>
 
 <style lang="scss" scoped>
@@ -139,6 +155,7 @@
     &.gd-port-active::before {
       opacity: 1;
     }
+
     @media only screen and (max-width: 640px) {
       .gd-port-body {
         .gd-port-device {

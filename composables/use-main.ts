@@ -9,7 +9,7 @@ import type { Device, Menu, Reading, State, Theme, View } from "~~/types/general
 
 type Order = { [k: string]: string[] }
 
-export default function () {
+export default function() {
   const { $fetch } = useNuxtApp();
   const config = useRuntimeConfig();
 
@@ -98,7 +98,7 @@ export default function () {
       [k: string]: {
         sensor?: Sensor;
         relay?: Relay;
-      }[] 
+      }[]
     };
   } | null> => {
     try {
@@ -146,10 +146,12 @@ export default function () {
         }
       }
 
-      const d: { [k: string]: {
-        sensor?: Sensor;
-        relay?: Relay;
-      }[] } = {};
+      const d: {
+        [k: string]: {
+          sensor?: Sensor;
+          relay?: Relay;
+        }[]
+      } = {};
       for (const sensor of result.sensor) {
         if (!d[sensor.port_id]) {
           if (!o[sensor.port_id]) {
@@ -159,9 +161,10 @@ export default function () {
             d[sensor.port_id] = Array(o[sensor.port_id].length).fill({});
           }
         }
-        const j = o[sensor.port_id]?.findIndex(
+
+        const j = o[sensor.port_id] ? o[sensor.port_id].findIndex(
           (a) => a === sensor.id
-        ) || -1;
+        ) : -1;
 
         if (j > -1) {
           d[sensor.port_id][j] = { sensor };
@@ -170,6 +173,7 @@ export default function () {
           o[sensor.port_id].push(sensor.id);
         }
       }
+
       for (const relay of result.relay) {
         if (!d[relay.port_id]) {
           if (!o[relay.port_id]) {
@@ -179,9 +183,10 @@ export default function () {
             d[relay.port_id] = Array(o[relay.port_id].length).fill({});
           }
         }
-        const j = o[relay.port_id]?.findIndex(
+
+        const j = o[relay.port_id] ? o[relay.port_id].findIndex(
           (a) => a === relay.id
-        ) || -1;
+        ) : -1;
 
         if (j > -1) {
           d[relay.port_id][j] = { relay };
