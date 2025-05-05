@@ -1,8 +1,5 @@
 <template>
-  <div
-    class="gd-port"
-    :class="selected === port.id ? 'gd-port-active' : ''"
-  >
+  <div class="gd-port" :class="selected === port.id ? 'gd-port-active' : ''">
     <div class="gd-port-header">
       <div
         class="gd-port-information-container"
@@ -26,7 +23,11 @@
       <div
         v-for="device in devices"
         class="gd-port-device"
-        :class="dragId && dragId !== (device.sensor?.id || device.relay?.id || '') ? 'gd-port-device-dragging' : ''"
+        :class="
+          dragId && dragId !== (device.sensor?.id || device.relay?.id || '')
+            ? 'gd-port-device-dragging'
+            : ''
+        "
         :key="device.sensor?.id || device.relay?.id || ''"
         :data-id="id"
         :data-device-id="device.sensor?.id || device.relay?.id || ''"
@@ -107,10 +108,8 @@
       return;
     }
 
-    dragId.value = gdTarget.value.dataset.deviceId;
+    dragId.value = gdTarget.value.dataset.deviceId || "";
     gdTarget.value.style.pointerEvents = "none";
-
-    const rect = gdTarget.value.getBoundingClientRect();
 
     const x = e.clientX - mouseX.value;
     const y = e.clientY - mouseY.value;
@@ -147,7 +146,9 @@
     }
 
     const newIndex = props.devices.findIndex(
-      (device) => (device.sensor?.id || device.relay?.id) === e.currentTarget.dataset.deviceId
+      (device) =>
+        (device.sensor?.id || device.relay?.id) ===
+        (e.currentTarget as HTMLElement)?.dataset?.deviceId
     );
     if (newIndex === -1) {
       return;
@@ -158,11 +159,11 @@
     props.devices[newIndex] = temp;
 
     // Change order
-    const orderCopy = JSON.parse(JSON.stringify(order.value[id.value]));
+    const orderCopy = JSON.parse(JSON.stringify(order.value.device[id.value]));
     const tempOrder = orderCopy[targetIndex];
     orderCopy[targetIndex] = orderCopy[newIndex];
     orderCopy[newIndex] = tempOrder;
-    order.value[id.value] = orderCopy;
+    order.value.device[id.value] = orderCopy;
   }
 </script>
 

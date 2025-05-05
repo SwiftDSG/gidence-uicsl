@@ -1,6 +1,6 @@
 <template>
   <div class="gd-ports">
-    <div 
+    <div
       class="gd-port"
       v-for="port in ports"
       :key="port.id"
@@ -42,10 +42,13 @@
   const props = defineProps<{
     controller: Controller;
     ports: Port[];
-    devices: Record<string, {
-      relay?: Relay;
-      sensor?: Sensor;
-    }[]>;
+    devices: Record<
+      string,
+      {
+        relay?: Relay;
+        sensor?: Sensor;
+      }[]
+    >;
     selected: string | null;
   }>();
   const { order, openMenu } = useMain();
@@ -89,10 +92,8 @@
       return;
     }
 
-    dragId.value = gdTarget.value.dataset.portId;
+    dragId.value = gdTarget.value.dataset.portId || "";
     gdTarget.value.style.pointerEvents = "none";
-
-    const rect = gdTarget.value.getBoundingClientRect();
 
     const x = e.clientX - mouseX.value;
     const y = e.clientY - mouseY.value;
@@ -129,24 +130,23 @@
     }
 
     const newIndex = props.ports.findIndex(
-      (port) => port.id === e.currentTarget.dataset.portId
+      (port) => port.id === (e.currentTarget as HTMLElement)?.dataset?.portId
     );
     if (newIndex === -1) {
       return;
     }
 
-    const temp = props.port[targetIndex];
-    props.port[targetIndex] = props.port[newIndex];
-    props.port[newIndex] = temp;
+    const temp = props.ports[targetIndex];
+    props.ports[targetIndex] = props.ports[newIndex];
+    props.ports[newIndex] = temp;
 
     // Change order
-    const orderCopy = JSON.parse(JSON.stringify(order.value));
+    const orderCopy = JSON.parse(JSON.stringify(order.value.port));
     const tempOrder = orderCopy[targetIndex];
     orderCopy[targetIndex] = orderCopy[newIndex];
     orderCopy[newIndex] = tempOrder;
-    order.value = orderCopy;
+    order.value.port = orderCopy;
   }
-
 </script>
 
 <style lang="scss" scoped>

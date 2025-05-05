@@ -7,9 +7,12 @@ import type { Sensor } from "~/types/sensor";
 import type { Watcher } from "~/types/watcher";
 import type { Device, Menu, Reading, State, Theme, View } from "~~/types/general";
 
-type Order = { [k: string]: string[] };
+type Order = {
+  port: string[];
+  device: { [k: string]: string[] };
+};
 
-export default function() {
+export default function () {
   const { $fetch } = useNuxtApp();
   const config = useRuntimeConfig();
 
@@ -21,7 +24,10 @@ export default function() {
   const menus = useState<Menu[]>("menus", () => []);
   const device = useState<Device | null>("device", () => null);
   const reading = useState<Reading | null>("reading", () => null);
-  const order = useState<Order>("order", () => ({}));
+  const order = useState<Order>("order", () => ({
+    port: [],
+    device: {},
+  }));
   const pin = useState<string[]>("pin", () => []);
 
   const getTheme = (): Theme => {
@@ -125,11 +131,14 @@ export default function() {
       if (orderRaw) {
         order.value = JSON.parse(orderRaw);
       } else {
-        order.value = {};
+        order.value = {
+          port: [],
+          device: {},
+        };
       }
 
       const o: Order = JSON.parse(JSON.stringify(order.value));
-      const k = Object.keys(o);
+      const k = o.port;
       const p = result.port;
       let u = k.length;
       for (let i = 0; i < p.length; i++) {
@@ -143,7 +152,8 @@ export default function() {
           p[u] = p[i];
           p[i] = t;
           u += 1;
-          o[p[i].id] = [];
+          o.port.push(p[i].id);
+          o.device[p[i].id] = [];
         }
       }
 
@@ -155,15 +165,15 @@ export default function() {
       } = {};
       for (const sensor of result.sensor) {
         if (!d[sensor.port_id]) {
-          if (!o[sensor.port_id]) {
-            o[sensor.port_id] = [];
+          if (!o.device[sensor.port_id]) {
+            o.device[sensor.port_id] = [];
             d[sensor.port_id] = [];
           } else {
-            d[sensor.port_id] = Array(o[sensor.port_id].length).fill({});
+            d[sensor.port_id] = Array(o.device[sensor.port_id].length).fill({});
           }
         }
 
-        const j = o[sensor.port_id] ? o[sensor.port_id].findIndex(
+        const j = o.device[sensor.port_id] ? o.device[sensor.port_id].findIndex(
           (a) => a === sensor.id
         ) : -1;
 
@@ -171,21 +181,21 @@ export default function() {
           d[sensor.port_id][j] = { sensor };
         } else {
           d[sensor.port_id].push({ sensor });
-          o[sensor.port_id].push(sensor.id);
+          o.device[sensor.port_id].push(sensor.id);
         }
       }
 
       for (const relay of result.relay) {
         if (!d[relay.port_id]) {
-          if (!o[relay.port_id]) {
-            o[relay.port_id] = [];
+          if (!o.device[relay.port_id]) {
+            o.device[relay.port_id] = [];
             d[relay.port_id] = [];
           } else {
-            d[relay.port_id] = Array(o[relay.port_id].length).fill({});
+            d[relay.port_id] = Array(o.device[relay.port_id].length).fill({});
           }
         }
 
-        const j = o[relay.port_id] ? o[relay.port_id].findIndex(
+        const j = o.device[relay.port_id] ? o.device[relay.port_id].findIndex(
           (a) => a === relay.id
         ) : -1;
 
@@ -193,7 +203,7 @@ export default function() {
           d[relay.port_id][j] = { relay };
         } else {
           d[relay.port_id].push({ relay });
-          o[relay.port_id].push(relay.id);
+          o.device[relay.port_id].push(relay.id);
         }
       }
 
