@@ -127,6 +127,11 @@ export default function () {
         device.value = result;
       }
 
+      const pinRaw = localStorage.getItem("pin");
+      if (pinRaw) {
+        pin.value = JSON.parse(pinRaw);
+      }
+
       const orderRaw = localStorage.getItem("order");
       if (orderRaw) {
         order.value = JSON.parse(orderRaw);
@@ -213,7 +218,7 @@ export default function () {
         port: p,
         device: d,
       };
-    } catch (e) {
+    } catch {
       return null;
     }
   };
@@ -230,7 +235,7 @@ export default function () {
       reading.value = result;
 
       return result
-    } catch (e) {
+    } catch {
       return null;
     }
   };

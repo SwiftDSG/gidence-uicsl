@@ -1,5 +1,5 @@
 <template>
-  <div class="gd-function">
+  <div class="gd-function" :class="pinned ? 'gd-function-pinned' : ''">
     <div
       class="gd-function-information-container"
       @click="emits('open', props.function)"
@@ -10,12 +10,21 @@
     </div>
     <div class="gd-function-action-container">
       <gd-input-button-small
+        v-if="!pinned"
+        :tooltip="index >= 0 ? 'Unpin function' : 'Pin function'"
+        icon="pin"
+        @clicked="pinHandler"
+        :loading="functionLoading"
+        :type="index >= 0 ? 'primary' : 'default'"
+      />
+      <gd-input-button-small
         tooltip="Run function"
         icon="play"
         @clicked="run"
         :loading="functionLoading"
       />
       <gd-input-button-small
+        v-if="!pinned"
         tooltip="Delete function"
         icon="delete"
         type="error"
@@ -30,12 +39,17 @@
 
   const props = defineProps<{
     function: Function;
+    pinned?: boolean;
   }>();
   const emits = defineEmits(["open", "delete"]);
-  const { getDevice } = useMain();
+  const { pin, getDevice } = useMain();
   const { executeFunction } = useFunction();
 
   const functionLoading = ref<boolean>(false);
+
+  const index = computed(() => {
+    return pin.value.findIndex((a) => a === props.function.id);
+  });
 
   async function run() {
     functionLoading.value = true;
@@ -46,6 +60,14 @@
     setTimeout(async () => {
       functionLoading.value = false;
     }, 500);
+  }
+
+  function pinHandler() {
+    if (index.value === -1) {
+      pin.value.push(props.function.id);
+    } else {
+      pin.value.splice(index.value, 1);
+    }
   }
 </script>
 
@@ -78,6 +100,12 @@
       position: relative;
       display: flex;
       gap: 0.5rem;
+    }
+
+    &.gd-function-pinned {
+      background: var(--background-depth-two-color);
+      border: var(--border);
+      border-radius: 1rem;
     }
   }
 </style>

@@ -35,6 +35,26 @@
             />
           </div>
         </div>
+        <div v-if="pinnedFunction.length > 0" class="gd-controller-functions">
+          <gd-function
+            v-for="fn in pinnedFunction"
+            :key="fn.id"
+            :function="fn"
+            :pinned="true"
+            @open="
+              (fn) =>
+                openMenu({
+                  functionInformation: {
+                    function: fn,
+                    functions: device?.function || [],
+                    sensors: device?.sensor || [],
+                    relays: device?.relay || [],
+                  },
+                })
+            "
+            @delete="(fn) => openMenu({ functionDelete: { function: fn } })"
+          />
+        </div>
         <gd-ports
           :controller="device.controller"
           :ports="ports"
@@ -56,10 +76,11 @@
   import type { Port } from "~/types/port";
   import type { Relay } from "~/types/relay";
   import type { Sensor } from "~/types/sensor";
+  import type { Function } from "~/types/function";
 
   const emits = defineEmits(["shake"]);
 
-  const { view, device, order, menus, openMenu, getDevice, getReading } =
+  const { view, device, order, menus, pin, openMenu, getDevice, getReading } =
     useMain();
 
   const loading = ref<boolean>(true);
@@ -104,6 +125,9 @@
     }
     return null;
   });
+  const pinnedFunction = computed<Function[]>(() => {
+    return device.value?.function.filter((f) => pin.value.includes(f.id)) || [];
+  });
 
   async function refresh() {
     const [device, reading] = await Promise.all([getDevice(), getReading()]);
@@ -137,9 +161,21 @@
     () => order.value,
     (val) => {
       if (!val) {
+        localStorage.removeItem("order");
         return;
       }
       localStorage.setItem("order", JSON.stringify(val));
+    },
+    { deep: true }
+  );
+  watch(
+    () => pin.value,
+    (val) => {
+      if (!val) {
+        localStorage.removeItem("pin");
+        return;
+      }
+      localStorage.setItem("pin", JSON.stringify(val));
     },
     { deep: true }
   );
@@ -250,6 +286,22 @@
               }
             }
           }
+        }
+      }
+
+      .gd-controller-functions {
+        position: relative;
+        width: 100%;
+        padding: 1rem;
+        box-sizing: border-box;
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+
+        .gd-function {
+          position: relative;
+          width: calc((100% - 3rem) / 4);
+          flex-shrink: 0;
         }
       }
     }
