@@ -2,7 +2,6 @@
   <div
     class="gd-port"
     :class="selected === port.id ? 'gd-port-active' : ''"
-    :key="port.id"
   >
     <div class="gd-port-header">
       <div

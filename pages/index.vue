@@ -35,28 +35,12 @@
             />
           </div>
         </div>
-        <div class="gd-controller-body">
-          <gd-port
-            v-for="port in ports"
-            :key="port.id"
-            :port="port"
-            :devices="devices[port.id]"
-            :selected="instrumentSelected"
-            @select="openMenu({ port: { port } })"
-          />
-          <div class="gd-controller-actions">
-            <gd-input-button
-              label="add port"
-              type="background"
-              :radius="1"
-              @clicked="
-                openMenu({
-                  portInformation: {},
-                })
-              "
-            />
-          </div>
-        </div>
+        <gd-ports
+          :controller="device.controller"
+          :ports="ports"
+          :devices="devices"
+          :selected="instrumentSelected"
+        />
       </div>
     </client-only>
     <gd-menus @shake="emits('shake')" />
@@ -69,9 +53,9 @@
 </template>
 
 <script lang="ts" setup>
-  import { Port } from "~/types/port";
-  import { Relay } from "~/types/relay";
-  import { Sensor } from "~/types/sensor";
+  import type { Port } from "~/types/port";
+  import type { Relay } from "~/types/relay";
+  import type { Sensor } from "~/types/sensor";
 
   const emits = defineEmits(["shake"]);
 
@@ -155,7 +139,6 @@
       if (!val) {
         return;
       }
-      console.log(val);
       localStorage.setItem("order", JSON.stringify(val));
     },
     { deep: true }
@@ -268,17 +251,6 @@
             }
           }
         }
-      }
-
-      .gd-controller-body {
-        position: relative;
-        width: 100%;
-        padding: 0 1rem;
-        box-sizing: border-box;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 1rem;
       }
     }
 
