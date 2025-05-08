@@ -1,14 +1,38 @@
 <template>
   <gd-menu label="Edit Controller" :active="active" class="gd-menu">
-    <div class="gd-menu-body">
-      <div class="gd-menu-input-wrapper">
-        <gd-input-text class="gd-menu-input" :input="nameInput" />
+    <div class="gd-menu-informations">
+      <div class="gd-menu-informations-header">
+        <span class="gd-menu-informations-title gd-headline-5"
+          >Controller information</span
+        >
+      </div>
+      <div class="gd-menu-informations-body">
+        <div class="gd-menu-input-wrapper">
+          <gd-input-text class="gd-menu-input" :input="nameInput" />
+        </div>
       </div>
     </div>
+    <div class="gd-menu-informations">
+      <div class="gd-menu-informations-header">
+        <span class="gd-menu-informations-title gd-headline-5"
+          >System password</span
+        >
+        <gd-input-toggle
+          class="gd-menu-item-information-input"
+          :input="lockEnabledInput"
+        />
+      </div>
+      <div v-if="lockEnabled" class="gd-menu-informations-body">
+        <div class="gd-menu-input-wrapper">
+          <gd-input-text class="gd-menu-input" :input="lockInput" />
+        </div>
+      </div>
+    </div>
+    <div class="gd-menu-padding"></div>
     <div class="gd-menu-footer">
       <gd-input-button
         @clicked="submit"
-        :disabled="!name"
+        :disabled="!name || (lockEnabled && lock.length !== 6)"
         :loading="submitLoading"
         style="width: 100%"
         label="update controller"
@@ -20,7 +44,7 @@
 <script lang="ts" setup>
   import { InputOption } from "~/types/general";
 
-  const { device, closeMenu } = useMain();
+  const { lock: l, device, closeMenu } = useMain();
   const { updateController } = useController();
 
   const emits = defineEmits(["shake"]);
@@ -38,10 +62,23 @@
       name: "",
       value: "",
     },
-    error: "",
+  });
+  const lockEnabledInput = ref<InputToggleOption>({
+    model: false,
+  });
+  const lockInput = ref<InputOption>({
+    name: "lock",
+    placeholder: "Enter PIN",
+    model: {
+      name: "",
+      value: "",
+    },
+    type: "password",
   });
 
   const name = computed<string>(() => nameInput.value.model.value);
+  const lockEnabled = computed<boolean>(() => lockEnabledInput.value.model);
+  const lock = computed<string>(() => lockInput.value.model.value);
 
   async function submit(): Promise<void> {
     if (!name.value || !device.value) return;
@@ -55,6 +92,13 @@
     setTimeout(() => {
       submitLoading.value = false;
       if (result) {
+        if (lock.value) {
+          l.value = lock.value;
+          localStorage.setItem("lock", lock.value);
+        } else {
+          l.value = "";
+          localStorage.removeItem("lock");
+        }
         if (device.value) device.value.controller = result;
         closeMenu();
       } else {
@@ -70,6 +114,13 @@
         value: device.value.controller.name,
       };
     }
+    if (l.value) {
+      lockEnabledInput.value.model = true;
+      lockInput.value.model = {
+        name: "",
+        value: l.value,
+      };
+    }
   });
 </script>
 
@@ -79,38 +130,83 @@
     display: flex;
     flex-direction: column;
 
-    .gd-menu-message {
+    .gd-menu-informations {
       position: relative;
       width: 100%;
-    }
-
-    .gd-menu-body {
-      position: relative;
-      width: 100%;
+      padding: 0.75rem;
+      border-radius: 0.75rem;
+      border: var(--border);
+      box-sizing: border-box;
+      background: var(--background-depth-one-color);
+      margin-bottom: 1rem;
       display: flex;
       flex-direction: column;
-      gap: 1rem;
+      gap: 0.75rem;
 
-      .gd-menu-input-wrapper {
+      .gd-menu-informations-header {
         position: relative;
         width: 100%;
         display: flex;
-        gap: 0 0.5rem;
-        flex-wrap: wrap;
-        align-items: flex-end;
+        justify-content: space-between;
+        align-items: center;
+      }
 
-        .gd-menu-input {
+      .gd-menu-informations-body {
+        position: relative;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+      }
+
+      .gd-menu-information {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        gap: 0.125rem;
+      }
+
+      .gd-menu-input-container {
+        position: relative;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+
+        .gd-menu-input-test-container {
           position: relative;
           width: 100%;
-        }
+          display: flex;
+          flex-direction: column;
 
-        .gd-menu-input-error {
-          position: relative;
-          width: 100%;
-          height: 1rem;
-          flex-shrink: 0;
+          .gd-menu-input-test-label {
+            position: relative;
+            width: 100%;
+            height: 1rem;
+            display: flex;
+            align-items: center;
+          }
+
+          .gd-menu-input-test {
+            position: relative;
+            width: 100%;
+            background: var(--background-depth-two-color);
+            padding: 0.5rem;
+            border: var(--border);
+            border-radius: 0.5rem;
+            box-sizing: border-box;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+          }
         }
       }
+    }
+
+    .gd-menu-padding {
+      position: relative;
+      width: 100%;
+      height: 4rem;
     }
 
     .gd-menu-footer {

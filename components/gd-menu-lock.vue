@@ -1,79 +1,116 @@
 <template>
-  <div class="gd-menu-overlay">
+  <div class="gd-menu-overlay" ref="gdMenuOverlay">
+    <gd-input-button-small 
+      v-if="view !== 'desktop'"
+      icon="arrow-left"
+      type="background"
+      style="position: absolute; top: 1rem; left: 1rem;"
+      @clicked="menus = []"
+    />
     <span class="gd-menu-overlay-title gd-headline-4">Enter PIN</span>
     <div class="gd-menu-overlay-numbers">
-      <div class="gd-menu-overlay-number"></div>
-      <div class="gd-menu-overlay-number"></div>
-      <div class="gd-menu-overlay-number"></div>
-      <div class="gd-menu-overlay-number"></div>
-      <div class="gd-menu-overlay-number"></div>
-      <div class="gd-menu-overlay-number"></div>
+      <div v-for="(letter, i) in lock" :key="i" class="gd-menu-overlay-number" :class="(i + 1) <= enteredPin.length ? 'gd-menu-overlay-number-filled' : ''" ></div>
     </div>
     <div class="gd-menu-overlay-keypad">
       <div class="gd-menu-overlay-row">
-        <button class="gd-menu-overlay-row-button">
-          <gd-svg name="1" />
-        </button>
-        <button class="gd-menu-overlay-row-button">
-          <gd-svg name="2" />
-        </button>
-        <button class="gd-menu-overlay-row-button">
-          <gd-svg name="3" />
-        </button>
+        <gd-input-button-big icon="1" :radius="1.5" @clicked="enterPin('1')" />
+        <gd-input-button-big icon="2" :radius="1.5" @clicked="enterPin('2')" />
+        <gd-input-button-big icon="3" :radius="1.5" @clicked="enterPin('3')" />
       </div>
       <div class="gd-menu-overlay-row">
-        <button class="gd-menu-overlay-row-button">
-          <gd-svg name="4" />
-        </button>
-        <button class="gd-menu-overlay-row-button">
-          <gd-svg name="5" />
-        </button>
-        <button class="gd-menu-overlay-row-button">
-          <gd-svg name="6" />
-        </button>
+        <gd-input-button-big icon="4" :radius="1.5" @clicked="enterPin('4')" />
+        <gd-input-button-big icon="5" :radius="1.5" @clicked="enterPin('5')" />
+        <gd-input-button-big icon="6" :radius="1.5" @clicked="enterPin('6')" />
       </div>
       <div class="gd-menu-overlay-row">
-        <button class="gd-menu-overlay-row-button">
-          <gd-svg name="7" />
-        </button>
-        <button class="gd-menu-overlay-row-button">
-          <gd-svg name="8" />
-        </button>
-        <button class="gd-menu-overlay-row-button">
-          <gd-svg name="9" />
-        </button>
+        <gd-input-button-big icon="7" :radius="1.5" @clicked="enterPin('7')" />
+        <gd-input-button-big icon="8" :radius="1.5" @clicked="enterPin('8')" />
+        <gd-input-button-big icon="9" :radius="1.5" @clicked="enterPin('9')" />
       </div>
       <div class="gd-menu-overlay-row">
-        <button class="gd-menu-overlay-row-button">
-          <gd-svg name="arrow-left" />
-        </button>
-        <button class="gd-menu-overlay-row-button">
-          <gd-svg name="0" />
-        </button>
-        <button
-          class="gd-menu-overlay-row-button gd-menu-overlay-row-button-primary"
-        >
-          <gd-svg name="arrow-right" />
-        </button>
+        <gd-input-button-big icon="arrow-left" :radius="1.5" @clicked="deletePin('0')" />
+        <gd-input-button-big icon="0" :radius="1.5" @clicked="enterPin('0')" />
+        <gd-input-button-big icon="arrow-right" type="primary" :radius="1.5" @clicked="checkPin" />
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
+  import gsap from "gsap";
   import { InputOption } from "~/types/general";
 
-  const pinInput = ref<InputOption>({
-    name: "pin",
-    placeholder: "Enter PIN",
-    type: "password",
-    disabled: true,
-    alignment: "center",
-    model: {
-      name: "",
-      value: "",
+  const emits = defineEmits(["shake"]);
+  const { locked, lock, view, menus } = useMain();
+
+  const gdMenuOverlay = ref<HTMLElement | null>(null);
+
+  const enteredPin = ref<string>("");
+
+  const animate = {
+    init(gdPanel: HTMLElement) {
+      gsap.to(gdPanel, {
+        scale: 1,
+        opacity: 1,
+        duration: 0.5,
+        filter: "blur(0px)",
+        ease: "power4.out",
+      });
     },
-  });
+    exit(gdPanel: HTMLElement, cb?: () => void) {
+      const vars: gsap.TweenVars = {
+        scale: 1.1,
+        opacity: 0,
+        filter: "blur(10px)",
+        ease: "power2.inOut",
+        onComplete() {
+          if (cb) cb();
+        },
+      };
+
+      if (view.value === "desktop") {
+        delete vars.filter;
+        delete vars.scale;
+      }
+
+      gsap.to(gdPanel, vars);
+    },
+  };
+
+  function enterPin(pin: string) {
+    if (enteredPin.value.length < lock.value.length) {
+      enteredPin.value += pin;
+    }
+  }
+  function deletePin() {
+    if (enteredPin.value.length > 0) {
+      enteredPin.value = enteredPin.value.slice(0, -1);
+    }
+  }
+  function checkPin() {
+    if (enteredPin.value === lock.value) {
+      animate.exit(gdMenuOverlay.value, () => {
+        locked.value = false;
+      });
+    } else {
+      emits("shake");
+      enteredPin.value = "";
+    }
+  }
+
+  watch(() => menus.value.length, (val, oldVal) => {
+    if (view.value !== "desktop" && gdMenuOverlay.value) {
+      if (val > 0 && !oldVal) {
+        animate.init(gdMenuOverlay.value);
+      } else if (val === 0 && oldVal) {
+        animate.exit(gdMenuOverlay.value);
+      }
+    }
+  })
+
+  onMounted(() => {
+    
+  })
 </script>
 
 <style lang="scss" scoped>
@@ -107,6 +144,10 @@
         display: flex;
         justify-content: center;
         align-items: center;
+
+        &.gd-menu-overlay-number-filled {
+          background-color: var(--primary-color);
+        }
       }
     }
 
@@ -154,6 +195,12 @@
           }
         }
       }
+    }
+
+    @media only screen and (max-width: 1280px) {
+      opacity: 0;
+      transform: scale(1.1);
+      filter: blur(10px);
     }
   }
 </style>

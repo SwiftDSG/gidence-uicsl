@@ -25,6 +25,7 @@
             <gd-input-button-small
               v-if="view !== 'desktop'"
               icon="dots"
+              :radius="1"
               @clicked="
                 openMenu({
                   controller: {
@@ -35,7 +36,7 @@
             />
           </div>
         </div>
-        <div v-if="pinnedFunction.length > 0" class="gd-controller-functions">
+        <div v-if="pinnedFunction.length > 0" class="gd-controller-functions" :style="locked ? 'pointer-events: none' : ''">
           <gd-function
             v-for="fn in pinnedFunction"
             :key="fn.id"
@@ -60,6 +61,7 @@
           :ports="ports"
           :devices="devices"
           :selected="instrumentSelected"
+          :style="locked ? 'pointer-events: none' : ''"
         />
       </div>
     </client-only>
@@ -80,7 +82,7 @@
 
   const emits = defineEmits(["shake"]);
 
-  const { view, device, order, menus, pin, openMenu, getDevice, getReading } =
+  const { view, device, order, menus, pin, lock, locked, load, openMenu, getDevice, getReading } =
     useMain();
 
   const loading = ref<boolean>(true);
@@ -179,8 +181,16 @@
     },
     { deep: true }
   );
+  watch(() => locked.value, (val) => {
+    if (!val) {
+      setTimeout(() => {
+        if (lock.value) locked.value = true;
+      }, 1000 * 60 * 5);
+    }
+  });
 
   onMounted(async () => {
+    load();
     await refresh();
 
     if (view.value === "desktop" && device.value) {

@@ -24,7 +24,7 @@
           :type="reading?.[0] ? 'error' : 'primary'"
           :color="reading?.[0] ? 'error' : undefined"
           icon="power"
-          :disabled="reading === undefined"
+          :disabled="reading === undefined || locked"
           @clicked="flipState"
         />
       </div>
@@ -51,7 +51,7 @@
     relay: Relay;
     reading?: [boolean, number];
   }>();
-  const { updateReadingRelay } = useMain();
+  const { locked, updateReadingRelay } = useMain();
   const { flipRelay } = useRelay();
 
   const flipLoading = ref<boolean>(false);

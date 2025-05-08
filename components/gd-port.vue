@@ -16,6 +16,7 @@
         label="add device"
         type="background"
         :radius="0.75"
+        :disabled="locked"
         @clicked="openMenu({ deviceInformation: { port } })"
       />
     </div>
@@ -67,7 +68,7 @@
     }[];
     selected: string | null;
   }>();
-  const { reading, order, openMenu } = useMain();
+  const { locked, reading, order, openMenu } = useMain();
 
   const gdTarget = ref<HTMLElement | null>(null);
 

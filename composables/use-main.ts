@@ -29,6 +29,8 @@ export default function () {
     device: {},
   }));
   const pin = useState<string[]>("pin", () => []);
+  const lock = useState<string>("lock", () => "");
+  const locked = useState<boolean>("locked", () => false);
 
   const getTheme = (): Theme => {
     const stored = localStorage?.getItem("theme") || "";
@@ -127,10 +129,6 @@ export default function () {
         device.value = result;
       }
 
-      const pinRaw = localStorage.getItem("pin");
-      if (pinRaw) {
-        pin.value = JSON.parse(pinRaw);
-      }
 
       const orderRaw = localStorage.getItem("order");
       if (orderRaw) {
@@ -240,6 +238,18 @@ export default function () {
     }
   };
 
+  const load = (): void => {
+    lock.value = localStorage.getItem("lock") || "";
+    if (lock.value) {
+      locked.value = true;
+    }
+
+    const pinRaw = localStorage.getItem("pin");
+    if (pinRaw) {
+      pin.value = JSON.parse(pinRaw);
+    }
+  };
+
   return {
     rem,
     view,
@@ -251,6 +261,8 @@ export default function () {
     reading,
     order,
     pin,
+    lock,
+    locked,
     getTheme,
     setTheme,
     openMenu,
@@ -264,5 +276,6 @@ export default function () {
     updateDeviceWatcher,
     updateDeviceScheduler,
     updateReadingRelay,
+    load
   };
 }

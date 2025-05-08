@@ -138,7 +138,7 @@
         @shake="emits('shake')"
       />
     </div>
-    <gd-menu-lock />
+    <gd-menu-lock v-if="locked" @shake="emits('shake')" />
   </div>
 </template>
 
@@ -147,7 +147,7 @@
 
   const emits = defineEmits(["shake"]);
 
-  const { menus } = useMain();
+  const { menus, locked } = useMain();
 
   const menusCopy = ref<Menu[]>([]);
 
