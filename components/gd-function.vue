@@ -22,6 +22,7 @@
         icon="play"
         @clicked="run"
         :loading="functionLoading"
+        :radius="pinned ? 0.75 : 0.5"
       />
       <gd-input-button-small
         v-if="!pinned"

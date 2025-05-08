@@ -138,6 +138,7 @@
         @shake="emits('shake')"
       />
     </div>
+    <gd-menu-lock />
   </div>
 </template>
 

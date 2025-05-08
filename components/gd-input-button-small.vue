@@ -10,6 +10,7 @@
       type || 'default'
     }`"
     :disabled="disabled"
+    :style="radius ? `border-radius: ${radius}rem` : ''"
   >
     <div v-if="icon" class="gd-input-icon-container">
       <gd-svg
@@ -30,8 +31,14 @@
         <div class="gd-input-progress-bar-inner"></div>
       </div>
     </div>
-    <div class="gd-input-overlay"></div>
-    <div class="gd-input-border"></div>
+    <div
+      class="gd-input-overlay"
+      :style="radius ? `border-radius: ${radius}rem` : ''"
+    ></div>
+    <div
+      class="gd-input-border"
+      :style="radius ? `border-radius: ${radius}rem` : ''"
+    ></div>
     <client-only v-if="tooltip && view === 'desktop'">
       <div class="gd-input-tooltip">
         <span class="gd-input-tooltip-message gd-headline-6">{{
@@ -49,6 +56,7 @@
     icon?: string;
     image?: string;
     color?: string;
+    radius?: number;
     disabled?: boolean;
     loading?: boolean;
     type?: "default" | "primary" | "secondary" | "error";
