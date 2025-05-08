@@ -15,7 +15,7 @@
     <div class="gd-menu-informations">
       <div class="gd-menu-informations-header">
         <span class="gd-menu-informations-title gd-headline-5"
-          >System password</span
+          >System lock</span
         >
         <gd-input-toggle
           class="gd-menu-item-information-input"
@@ -42,13 +42,13 @@
 </template>
 
 <script lang="ts" setup>
-  import { InputOption } from "~/types/general";
+  import { InputOption, InputToggleOption } from "~/types/general";
 
   const { lock: l, device, closeMenu } = useMain();
   const { updateController } = useController();
 
   const emits = defineEmits(["shake"]);
-  const props = defineProps<{
+  defineProps<{
     active: boolean;
   }>();
 
@@ -92,7 +92,7 @@
     setTimeout(() => {
       submitLoading.value = false;
       if (result) {
-        if (lock.value) {
+        if (lockEnabled.value && lock.value) {
           l.value = lock.value;
           localStorage.setItem("lock", lock.value);
         } else {
@@ -117,7 +117,7 @@
     if (l.value) {
       lockEnabledInput.value.model = true;
       lockInput.value.model = {
-        name: "",
+        name: l.value,
         value: l.value,
       };
     }

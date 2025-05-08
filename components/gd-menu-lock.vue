@@ -1,15 +1,22 @@
 <template>
   <div class="gd-menu-overlay" ref="gdMenuOverlay">
-    <gd-input-button-small 
+    <gd-input-button-small
       v-if="view !== 'desktop'"
       icon="arrow-left"
-      type="background"
-      style="position: absolute; top: 1rem; left: 1rem;"
+      type="default"
+      style="position: absolute; top: 1rem; left: 1rem"
       @clicked="menus = []"
     />
     <span class="gd-menu-overlay-title gd-headline-4">Enter PIN</span>
     <div class="gd-menu-overlay-numbers">
-      <div v-for="(letter, i) in lock" :key="i" class="gd-menu-overlay-number" :class="(i + 1) <= enteredPin.length ? 'gd-menu-overlay-number-filled' : ''" ></div>
+      <div
+        v-for="(letter, i) in lock"
+        :key="i"
+        class="gd-menu-overlay-number"
+        :class="
+          i + 1 <= enteredPin.length ? 'gd-menu-overlay-number-filled' : ''
+        "
+      ></div>
     </div>
     <div class="gd-menu-overlay-keypad">
       <div class="gd-menu-overlay-row">
@@ -28,9 +35,18 @@
         <gd-input-button-big icon="9" :radius="1.5" @clicked="enterPin('9')" />
       </div>
       <div class="gd-menu-overlay-row">
-        <gd-input-button-big icon="arrow-left" :radius="1.5" @clicked="deletePin('0')" />
+        <gd-input-button-big
+          icon="arrow-left"
+          :radius="1.5"
+          @clicked="deletePin"
+        />
         <gd-input-button-big icon="0" :radius="1.5" @clicked="enterPin('0')" />
-        <gd-input-button-big icon="arrow-right" type="primary" :radius="1.5" @clicked="checkPin" />
+        <gd-input-button-big
+          icon="arrow-right"
+          type="primary"
+          :radius="1.5"
+          @clicked="checkPin"
+        />
       </div>
     </div>
   </div>
@@ -88,7 +104,7 @@
     }
   }
   function checkPin() {
-    if (enteredPin.value === lock.value) {
+    if (enteredPin.value === lock.value && gdMenuOverlay.value) {
       animate.exit(gdMenuOverlay.value, () => {
         locked.value = false;
       });
@@ -98,19 +114,20 @@
     }
   }
 
-  watch(() => menus.value.length, (val, oldVal) => {
-    if (view.value !== "desktop" && gdMenuOverlay.value) {
-      if (val > 0 && !oldVal) {
-        animate.init(gdMenuOverlay.value);
-      } else if (val === 0 && oldVal) {
-        animate.exit(gdMenuOverlay.value);
+  watch(
+    () => menus.value.length,
+    (val, oldVal) => {
+      if (view.value !== "desktop" && gdMenuOverlay.value) {
+        if (val > 0 && !oldVal) {
+          animate.init(gdMenuOverlay.value);
+        } else if (val === 0 && oldVal) {
+          animate.exit(gdMenuOverlay.value);
+        }
       }
     }
-  })
+  );
 
-  onMounted(() => {
-    
-  })
+  onMounted(() => {});
 </script>
 
 <style lang="scss" scoped>

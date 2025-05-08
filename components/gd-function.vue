@@ -15,6 +15,7 @@
         icon="pin"
         @clicked="pinHandler"
         :loading="functionLoading"
+        :disabled="locked"
         :type="index >= 0 ? 'primary' : 'default'"
       />
       <gd-input-button-small
@@ -22,6 +23,7 @@
         icon="play"
         @clicked="run"
         :loading="functionLoading"
+        :disabled="locked"
         :radius="pinned ? 0.75 : 0.5"
       />
       <gd-input-button-small
@@ -29,6 +31,7 @@
         tooltip="Delete function"
         icon="delete"
         type="error"
+        :disabled="locked"
         @clicked="emits('delete', props.function)"
       />
     </div>
@@ -43,7 +46,7 @@
     pinned?: boolean;
   }>();
   const emits = defineEmits(["open", "delete"]);
-  const { pin, getDevice } = useMain();
+  const { pin, locked, getDevice } = useMain();
   const { executeFunction } = useFunction();
 
   const functionLoading = ref<boolean>(false);
