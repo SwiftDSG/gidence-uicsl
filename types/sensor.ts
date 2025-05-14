@@ -6,6 +6,7 @@ export type Sensor = {
   address: number;
   format: "f32be" | "u32" | "i16" | "mod10";
   kind: "temperature" | "discharge" | "pressure";
+  method: "read_holding_register" | "read_input_register";
   adjustment: SensorAdjustment[];
 }
 
