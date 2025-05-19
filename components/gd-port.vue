@@ -109,6 +109,18 @@
       return;
     }
 
+    if (
+      dragId.value === "" &&
+      (Math.abs(e.clientX - mouseX.value) > 5 ||
+        Math.abs(e.clientY - mouseY.value) > 5)
+    ) {
+      // Set the element to be dragged
+      dragId.value = gdTarget.value.dataset.deviceId || "";
+      gdTarget.value.style.pointerEvents = "none";
+    } else if (dragId.value === "") {
+      return;
+    }
+
     dragId.value = gdTarget.value.dataset.deviceId || "";
     gdTarget.value.style.pointerEvents = "none";
 

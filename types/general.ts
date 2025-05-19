@@ -18,6 +18,10 @@ export type Device = {
   watcher: Watcher[];
   scheduler: Scheduler[];
 };
+export type Order = {
+  port: string[];
+  device: { [k: string]: string[] };
+};
 export type Reading = {
   sensor: { [k: string]: [number, number]; }; // [value, timestamp]
   relay: { [k: string]: [boolean, number]; }; // [value, timestamp]

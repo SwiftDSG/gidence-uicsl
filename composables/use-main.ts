@@ -1,16 +1,10 @@
-
 import type { Scheduler } from "~/types/scheduler";
 import type { Function } from "~/types/function";
 import type { Port } from "~/types/port";
 import type { Relay } from "~/types/relay";
 import type { Sensor } from "~/types/sensor";
 import type { Watcher } from "~/types/watcher";
-import type { Device, Menu, Reading, State, Theme, View } from "~~/types/general";
-
-type Order = {
-  port: string[];
-  device: { [k: string]: string[] };
-};
+import type { Device, Menu, Order, Reading, State, Theme, View } from "~~/types/general";
 
 export default function () {
   const { $fetch } = useNuxtApp();
@@ -101,15 +95,7 @@ export default function () {
     reading.value.relay[relay.id] = [!state, Date.now()];
   }
 
-  const getDevice = async (): Promise<{
-    port: Port[];
-    device: {
-      [k: string]: {
-        sensor?: Sensor;
-        relay?: Relay;
-      }[]
-    };
-  } | null> => {
+  const getDevice = async (): Promise<Device | null> => {
     try {
       const response: Response = await $fetch(
         `${config.public.controllerBase}/device`,
@@ -118,104 +104,9 @@ export default function () {
       if (response.status !== 200) throw new Error("");
 
       const result: Device = await response.json();
+      device.value = result;
 
-      if (device.value) {
-        if (JSON.stringify(device.value) !== JSON.stringify(result)) {
-          device.value = result;
-        } else {
-          throw new Error("");
-        }
-      } else {
-        device.value = result;
-      }
-
-
-      const orderRaw = localStorage.getItem("order");
-      if (orderRaw) {
-        order.value = JSON.parse(orderRaw);
-      } else {
-        order.value = {
-          port: [],
-          device: {},
-        };
-      }
-
-      const o: Order = JSON.parse(JSON.stringify(order.value));
-      const k = o.port;
-      const p = result.port;
-      let u = k.length;
-      for (let i = 0; i < p.length; i++) {
-        const j = k.findIndex((a) => p[i].id === a);
-        if (j > -1) {
-          const t = p[j];
-          p[j] = p[i];
-          p[i] = t;
-        } else {
-          const t = p[u];
-          p[u] = p[i];
-          p[i] = t;
-          u += 1;
-          o.port.push(p[i].id);
-          o.device[p[i].id] = [];
-        }
-      }
-
-      const d: {
-        [k: string]: {
-          sensor?: Sensor;
-          relay?: Relay;
-        }[]
-      } = {};
-      for (const sensor of result.sensor) {
-        if (!d[sensor.port_id]) {
-          if (!o.device[sensor.port_id]) {
-            o.device[sensor.port_id] = [];
-            d[sensor.port_id] = [];
-          } else {
-            d[sensor.port_id] = Array(o.device[sensor.port_id].length).fill({});
-          }
-        }
-
-        const j = o.device[sensor.port_id] ? o.device[sensor.port_id].findIndex(
-          (a) => a === sensor.id
-        ) : -1;
-
-        if (j > -1) {
-          d[sensor.port_id][j] = { sensor };
-        } else {
-          d[sensor.port_id].push({ sensor });
-          o.device[sensor.port_id].push(sensor.id);
-        }
-      }
-
-      for (const relay of result.relay) {
-        if (!d[relay.port_id]) {
-          if (!o.device[relay.port_id]) {
-            o.device[relay.port_id] = [];
-            d[relay.port_id] = [];
-          } else {
-            d[relay.port_id] = Array(o.device[relay.port_id].length).fill({});
-          }
-        }
-
-        const j = o.device[relay.port_id] ? o.device[relay.port_id].findIndex(
-          (a) => a === relay.id
-        ) : -1;
-
-        if (j > -1) {
-          d[relay.port_id][j] = { relay };
-        } else {
-          d[relay.port_id].push({ relay });
-          o.device[relay.port_id].push(relay.id);
-        }
-      }
-
-      order.value = o;
-
-      return {
-        port: p,
-        device: d,
-      };
+      return result;
     } catch {
       return null;
     }
@@ -242,6 +133,16 @@ export default function () {
     lock.value = localStorage.getItem("lock") || "";
     if (lock.value) {
       locked.value = true;
+    }
+
+    const orderRaw = localStorage.getItem("order");
+    if (orderRaw) {
+      order.value = JSON.parse(orderRaw);
+    } else {
+      order.value = {
+        port: [],
+        device: {},
+      };
     }
 
     const pinRaw = localStorage.getItem("pin");

@@ -98,6 +98,7 @@
         ...props.relay,
         locked: val,
       });
+      console.log(result);
       if (result) {
         updateDeviceRelay(result);
       }
