@@ -1,6 +1,6 @@
 # Repo Links
 - [Web](https://github.com/SwiftDSG/gidence-uicsl)
-- [Controller](https://github.com/SwiftDSG/gidence-uicsl-controller)
+- [Controller](https://github.com/salsahemat/gidence-uicsl-controller)
 
 # Nuxt 3 Minimal Starter
 
